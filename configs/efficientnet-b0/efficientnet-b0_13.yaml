@@ -1,0 +1,41 @@
+seed: 0
+exp_name: efficientnet-b0_13
+
+device:
+  cuda_device: cuda
+  gpu_num_workers: 32
+
+data:
+  cv: 10
+  img_dir: ./data/raw/VESPR_brain
+  fold_dir: ./data/processed/folds
+  clip:
+    min: 0
+    max: 2500
+  norm: minmax_scaler_-11
+  img_dim:
+    x: 160
+    y: 192
+    z: 160
+  model_dir: ./models/cnn
+  report_dir: ./reports
+  classes:
+    - 1
+    - 3
+  batch_size: 16
+
+model:
+  model_name: efficientnet-b0
+  freeze: False
+  pretrained: True
+  pretrained_path:
+
+trainer:
+  optimizer:
+    lr: 0.001
+    weight_decay: 0.00001
+  scheduler:
+    mode: min
+    patience: 10
+  early_stopping: 50
+  max_epochs: 300

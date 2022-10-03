@@ -1,0 +1,23 @@
+seed: 0
+exp_name: efficientnet-b1_joint
+
+device:
+  cuda_device: cuda
+  gpu_num_workers: 32
+
+cv: 10
+classes:
+  - 1
+  - 2
+  - 3
+  - 4
+
+report_dir: ./reports
+
+exp_list:
+  efficientnet-b1_12: ./configs/efficientnet-b1/efficientnet-b1_12.yaml
+  efficientnet-b1_13: ./configs/efficientnet-b1/efficientnet-b1_13.yaml
+  efficientnet-b1_14: ./configs/efficientnet-b1/efficientnet-b1_14.yaml
+  efficientnet-b1_23: ./configs/efficientnet-b1/efficientnet-b1_23.yaml
+  efficientnet-b1_24: ./configs/efficientnet-b1/efficientnet-b1_24.yaml
+  efficientnet-b1_34: ./configs/efficientnet-b1/efficientnet-b1_34.yaml
