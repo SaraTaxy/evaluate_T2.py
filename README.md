@@ -2,4 +2,4 @@
 
 ## Project for multimodal training and classification of HLGD and controls
 
-HejHej & CiaoCiao
+HejHej & CiaoCiao!
