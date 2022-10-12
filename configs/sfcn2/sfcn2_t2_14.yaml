@@ -7,7 +7,7 @@ device:
 
 data:
   cv: 10
-  img_dir: ./data/raw/VESPR_brain
+  img_dir: ./data/raw/T2_images                       #path for T2 images
   fold_dir: ./data/processed/folds
   clip:
     min: 0
