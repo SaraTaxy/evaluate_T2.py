@@ -7,9 +7,15 @@ import src.utils.util_general as util_general
 import src.utils.util_model as util_model
 
 # Configuration file
-args = util_general.get_args()
+#args = util_general.get_args()
 #args.cfg_file = "./configs/early/resnet50sfcn_svm_14.yaml"
+'''
 with open(args.cfg_file) as file:
+    cfg = yaml.load(file, Loader=yaml.FullLoader)
+'''
+
+cfg_file = "./configs/sfcn2/sfcn2_14.yaml"
+with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 
 # Seed everything

@@ -19,11 +19,18 @@ os.environ['TORCH_HOME'] = './models/cnn/pretrained'
 ssl._create_default_https_context = ssl._create_unverified_context
 
 # Configuration file
-args = util_general.get_args()
+#args = util_general.get_args()
 #args.cfg_file = "./configs/sfcn2/sfcn2_12.yaml"
-with open(args.cfg_file) as file:
+
+cfg_file = "./configs/sfcn2/T1/sfcn2_14.yaml"
+with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 
+
+'''
+with open(args.cfg_file) as file:
+    cfg = yaml.load(file, Loader=yaml.FullLoader)
+'''
 # Seed everything
 util_general.seed_all(cfg['seed'])
 
@@ -54,6 +61,7 @@ util_general.create_dir(plot_training_dir)
 results = collections.defaultdict(lambda: [])
 acc_cols = []
 acc_class_cols = collections.defaultdict(lambda: [])
+
 for fold in fold_list:
     # Dir
     model_fold_dir = os.path.join(model_dir, str(fold))
@@ -76,6 +84,9 @@ for fold in fold_list:
     # Model
     print("%s%s%s" % ("*"*50, model_name, "*"*50))
     # util_general.notify_IFTTT("Start %i %s" % (fold, model_name))
+
+
+    ## se eseguo quello dopo si blocca
     model = util_model.initialize_model(model_name=model_name, num_classes=len(classes), cfg_model=cfg['model'], device=device)
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")

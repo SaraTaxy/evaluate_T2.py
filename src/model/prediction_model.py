@@ -13,11 +13,17 @@ torch.cuda.empty_cache()
 
 # Configuration file
 args = util_general.get_args()
+'''
 #args.cfg_file = "./configs/sfcn/sfcn_14.yaml"
 with open(args.cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
+'''
 
-# Seed everything
+cfg_file = "./configs/sfcn2/sfcn2_14.yaml"
+with open(cfg_file) as file:
+    cfg = yaml.load(file, Loader=yaml.FullLoader)
+
+#Seed everything
 util_general.seed_all(cfg['seed'])
 
 # Parameters

@@ -7,9 +7,14 @@ import yaml
 import src.utils.util_general as util_general
 
 # Configuration file
-args = util_general.get_args()
-args.cfg_file = "./configs/sfcn/sfcn_14.yaml"
+'''args = util_general.get_args()
+args.cfg_file = ".configs/sfcn2/T2/sfcn2_t2_14.yaml"
 with open(args.cfg_file) as file:
+    cfg = yaml.load(file, Loader=yaml.FullLoader)
+'''
+
+cfg_file = "./configs/sfcn2/T2/sfcn2_t2_14.yaml"
+with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 
 # Seed Everything

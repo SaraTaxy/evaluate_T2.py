@@ -17,7 +17,7 @@ import monai
 import src.utils.util_general as util_general
 import src.utils.sfcn as sfcn
 import src.utils.resnet as resnet
-import src.utils.resnetsfcn as resnetsfcn
+#import src.utils.resnetsfcn as resnetsfcn
 
 
 def freeze_layer_parameters(model, freeze_layers):
@@ -34,13 +34,13 @@ def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True
             if state_dict:
                 model.load_state_dict(torch.load(cfg_model["pretrained_path"], map_location=device))
             else:
-                model = torch.load(cfg_model["pretrained_path"], map_location=device)
+                #model = torch.load(cfg_model["pretrained_path"], map_location=device)
                 model = torch.nn.DataParallel(model)
         model = model.module
         if cfg_model["freeze"]:
             freeze_layer_parameters(model=model, freeze_layers=cfg_model["freeze_layers"])
         num_ftrs = model.classifier[-1].in_channels
-        model.classifier[-1] = nn.Conv3d(num_ftrs, num_classes, padding=0, kernel_size=1)
+        model.classifier[-1] = nn.Conv3d(num_ftrs, num_classes, padding=0, kernel_size=1)  #numero di classi 2
     elif model_name == "SFCN2":
         model = sfcn.SFCN2(output_dim=num_classes)
         model = torch.nn.DataParallel(model)
