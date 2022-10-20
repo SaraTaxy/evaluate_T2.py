@@ -278,12 +278,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import numpy as np
+import pandas as pd
 
 
 data_path = "data/raw/T2_images"
 
-dict_mask = {}
+d= {}
+p=0
+volum_images=[]
+n_images=[]
 for images in os.listdir(data_path):
+    dict_mask = {}
+    p=+1
     path_image = os.path.join(data_path, images)
     if path_image.find('DS_Store') != -1:
         continue
@@ -310,10 +316,94 @@ for images in os.listdir(data_path):
 
 
 
-    print("nome immagine ", path_image)
+    print("nome immagine: ", path_image)
     print("x min: ", np.amin(i_list), "x max: ", np.amax(i_list))
     print("y min: ", np.amin(j_list), "y max: ", np.amax(j_list))
     print("z min: ", np.amin(z_list), "z max: ", np.amax(z_list))
 
+    vol = (np.amax(i_list)-np.amin(i_list))*(np.amax(j_list)-np.amin(j_list))*(np.amax(z_list)-np.amin(z_list))
 
-    dict_mask = {"immagine": 1, "nome immagine": images , "dimensione mask": {"x": [np.amin(i_list), np.amax(i_list)], "y": [np.amin(j_list), np.amax(j_list)], "z": [np.amin(z_list),np.amax(z_list)]}}
+    print("vol in pixel: ", vol)
+    dict_mask = {"num image": p,
+                 "image": images,
+                 "x": [np.amin(i_list), np.amax(i_list)],
+                 "y": [np.amin(j_list), np.amax(j_list)],
+                 "z": [np.amin(z_list), np.amax(z_list)],
+                 "Pixel_Vol": vol}
+    d[i]=dict_mask
+
+    volum_images.append(dict_mask["Pixel_Vol"])
+    n_images.append(dict_mask["image"])
+
+#find max value of images volum
+
+max_vol=0
+index_max_vol=0
+for q in range(0, len(volum_images)):
+    if volum_images[i]>max_vol:
+        max_vol=volum_images[i]
+        index_max_vol=q
+    else:
+        max_vol= max_vol
+
+print("vol max: ", max_vol, "image vol max: ", n_images[index_max_vol])
+
+
+
+
+with open("mask_dimension_T2_images.txt", 'w') as f:
+    for key, value in d.items():
+        f.write('%s:%s\n' % (key, value))
+    f.write("volume max: ", max_vol, "im vol max", n_images[index_max_vol])
+
+
+
+
+
+#-----------------save cvs file ---------------
+d={}
+j=0
+for i in range(0,10):
+    d_n={}
+    j=+1
+    n=10*i
+    d_n={'nome': i, "valore": n}
+    d[i]=d_n
+
+print(d)
+
+with open("mask_dimension_T2_images.txt", 'w') as f:
+    for key, value in d.items():
+        f.write('%s:%s\n' % (key, value))
+
+
+
+#--------------max  in dict
+
+import numpy as np
+
+d={}
+j=0
+l = []
+nome = []
+for i in range(0,10):
+    d_n={}
+    j=+1
+    n=10*i
+    d_n={'nome': i, "valore": n}
+    d[i]=d_n
+    l.append(d_n['valore'])
+    nome.append(d_n['nome'])
+
+print(nome)
+
+max=0
+i=0
+for q in range(0, len(l)):
+    if l[q]>max:
+        max=l[q]
+        i=q
+    else:
+        max=max
+
+print(nome[i], max)
