@@ -74,7 +74,7 @@ delta_x: 325
 index image y max: RecordID_2120_T2_flair.nii
 delta_y: 396
 
-dim im final : (335, 396, 46)
+dim im final : (335, 406, 46)  --> added 5 pixel on left and right on x and y
 
 max pixel index image: RecordID_6038_T2_flair.nii
 max pixel: 3619.0

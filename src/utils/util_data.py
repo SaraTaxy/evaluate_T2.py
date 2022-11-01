@@ -123,6 +123,31 @@ def loader(img_path, img_dim, clip=None, norm=None, step="train"):
     return img
 
 
+def loader_T2(img_path, img_dim, clip=None, norm=None, step="train"):
+    # Img
+    img = load_img(img_path)
+    #cropping
+    img = cropping(img, delta_x_max, delta_x_min)  #crea
+
+    # Clip
+    if clip:
+        img = np.clip(img, clip['min'], clip['max'])
+    # Norm
+    if norm:
+        if norm == "max_scaler_01":
+            img = img / clip['max']
+        elif norm == "minmax_scaler_-11":
+            img = (((img - clip['min']) * (1 - (-1))) / (clip['max'] - clip['min'])) + (-1)
+    # Cropping
+    #img = crop_center(img, (img_dim['x'], img_dim['y'], img_dim['z']))
+    if step == "train":
+        img = augmentation(img)
+    # To Tensor
+    img = torch.Tensor(img)
+    img = torch.unsqueeze(img, dim=0)
+    return img
+
+
 class ImgDataset(torch.utils.data.Dataset):
     'Characterizes a dataset for PyTorch'
     def __init__(self, data, classes, cfg_data, step):

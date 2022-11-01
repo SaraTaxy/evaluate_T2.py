@@ -14,8 +14,8 @@ module load CUDA/11.3.1
 module load Python/3.8.6-GCCcore-10.2.0
 
 # Activate venv - HERE YOULL NEED TO ACTIVATE YOUR VIRTUALENV
-cd /mimer/NOBACKUP/groups/inphai/vallenv 
-source bin/activate
+cd /mimer/NOBACKUP/groups/inphai/sara/saraenv
+source bin/activate         #
 
 # Executes the code - HERE YOULL NEED TO CHANGE TO YOUR FOLDER
 cd /mimer/NOBACKUP/groups/inphai/
