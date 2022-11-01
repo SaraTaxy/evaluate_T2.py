@@ -1,0 +1,91 @@
+
+----------------------------------------0-100 DIM MASK MAX VOLUM IMAGE-----------------------------------------------------
+index image x max: BErRecordID_0024_T1.nii
+delta_x: 150
+index image y max: BErRecordID_0174_T1.nii
+delta_y: 183
+index image z max: BErRecordID_0024_T1.nii
+delta_z: 150
+Dimensioni immagine finale   (150, 182, 150)
+
+----------------------------------------100-200 DIM MASK MAX VOLUM IMAGE-----------------------------------------------------
+index image x max: BErRecordID_0711_T1.nii
+delta_x: 155
+index image y max: BErRecordID_0557_T1.nii
+delta_y: 187
+index image z max: BErRecordID_0711_T1.nii
+delta_z: 155
+Dimensioni immagine finale   (154, 186, 154)
+
+----------------------------------------200-300 DIM MASK MAX VOLUM IMAGE-----------------------------------------------------
+index image x max: BErRecordID_1387_T1.nii
+delta_x: 151
+index image y max: BErRecordID_1548_T1.nii
+delta_y: 187
+index image z max: BErRecordID_1387_T1.nii
+delta_z: 151
+Dimensioni immagine finale   (150, 186, 150)
+
+----------------------------------------300-400 DIM MASK MAX VOLUM IMAGE-----------------------------------------------------
+index image x max: BErRecordID_2180_T1.nii
+delta_x: 158
+index image y max: BErRecordID_2180_T1.nii
+delta_y: 191
+index image z max: BErRecordID_2180_T1.nii
+delta_z: 158
+Dimensioni immagine finale   (158, 190, 158)
+
+----------------------------------------400-500 DIM MASK MAX VOLUM IMAGE-----------------------------------------------------
+index image x max: BErRecordID_2998_T1.nii
+delta_x: 152
+index image y max: BErRecordID_3319_T1.nii
+delta_y: 187
+index image z max: BErRecordID_2998_T1.nii
+delta_z: 152
+Dimensioni immagine finale   (152, 186, 152)
+
+----------------------------------------500-600 DIM MASK MAX VOLUM IMAGE-----------------------------------------------------
+index image x max: BErRecordID_3381_T1.nii
+delta_x: 151
+index image y max: BErRecordID_3381_T1.nii
+delta_y: 184
+index image z max: BErRecordID_3381_T1.nii
+delta_z: 151
+Dimensioni immagine finale   (150, 184, 150)
+
+----------------------------------------600-700 DIM MASK MAX VOLUM IMAGE-----------------------------------------------------
+index image x max: BErRecordID_4462_T1.nii
+delta_x: 150
+index image y max: BErRecordID_4642_T1.nii
+delta_y: 186
+index image z max: BErRecordID_4462_T1.nii
+delta_z: 150
+Dimensioni immagine finale   (150, 186, 150)
+
+----------------------------------------700-800 DIM MASK MAX VOLUM IMAGE-----------------------------------------------------
+index image x max: BErRecordID_4838_T1.nii
+delta_x: 154
+index image y max: BErRecordID_5254_T1.nii
+delta_y: 185
+index image z max: BErRecordID_4838_T1.nii
+delta_z: 154
+Dimensioni immagine finale   (154, 184, 154)
+
+----------------------------------------800-880 DIM MASK MAX VOLUM IMAGE-----------------------------------------------------
+index image x max: BErRecordID_5969_T1.nii
+delta_x: 149
+index image y max: BErRecordID_6243_T1.nii
+delta_y: 185
+index image z max: BErRecordID_5969_T1.nii
+delta_z: 149
+Dimensioni immagine finale   (148, 184, 148)
+
+
+----------------------------------------DIM MASK MAX VOLUM IMAGE-----------------------------------------------------
+index image x max: BErRecordID_2180_T1.nii
+delta_x: 158
+index image y max: BErRecordID_2180_T1.nii
+delta_y: 191
+index image z max: BErRecordID_2180_T1.nii
+delta_z: 158
+Dimensioni immagine finale   (158, 191, 158)
