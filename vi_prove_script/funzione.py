@@ -431,8 +431,9 @@ from scipy.ndimage import shift
 import nibabel as nib
 import numpy as np
 from scipy.stats import norm
+import matplotlib.pyplot as plt
 
-img = cropping_T2(img, 325, 396)
+
 
 
 
@@ -448,11 +449,6 @@ def pad_with(vector, pad_width, iaxis, kwargs):
     vector[-pad_width[1]:] = pad_value
 
 
-
-
-img = load_img('data/raw/T2_images/RecordID_0012_T2_flair.nii')
-
-
 def cropping_T2(img, delta_x, delta_y):
 
     mask = (img[:, :, :] != 0)  # create a mask
@@ -462,21 +458,32 @@ def cropping_T2(img, delta_x, delta_y):
     x = np.where(np.any(mask, axis=1))[0]  # value im !=0 x
     x_min, x_max = x[[0, -1]]  # max and min x
 
-    x_star = delta_x/2
-    y_star = delta_y/2
+    x_star = int(delta_x/2)
+    y_star = int(delta_y/2)
 
-    delta_x_imag = (x_max - x_min)/2
-    delta_y_imag = (y_max - y_min) / 2
+    delta_x_imag = int((x_max - x_min)/2)
+    delta_y_imag = int((y_max - y_min)/2)
 
-    x_min_im = x_min + delta_x_imag - x_star
-    x_max_im =  x_max + delta_x_imag - x_star
+    x_min_im = x_min + delta_x_imag - x_star - 1
+    x_max_im = x_min + delta_x_imag + x_star
 
     y_min_im = y_min + delta_y_imag - y_star
-    y_max_im = y_max + delta_y_imag - y_star
+    y_max_im = y_min + delta_y_imag + y_star
+
 
     T2_image_final = img[x_min_im:x_max_im, y_min_im:y_max_im, :]
     T2_image_final = np.pad(T2_image_final, 5, pad_with)
-
-    T2_image_cropped = T2_image_final[:, :, 0:46]
+    T2_image_cropped = T2_image_final[:, :, 0:47]
+    print(T2_image_cropped.shape)
 
     return T2_image_cropped
+
+
+img = load_img('data/raw/T2_images/RecordID_4838_T2_flair.nii')
+
+
+
+img = nib.load('data/raw/T2_images/RecordID_0015_T2_flair.nii').get_fdata()
+img = cropping_T2(img, 325, 396)
+
+

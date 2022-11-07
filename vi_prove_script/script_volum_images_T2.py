@@ -1,15 +1,33 @@
 
+
+
+
+
+
+
+
+
+
+
 import nibabel as nib
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 T2_image = nib.load('data/raw/T2_images/RecordID_0015_T2_flair.nii').get_fdata()
-mask = (T2_image[:,:,:] != 0)
+
+T1_image = nib.load('data/raw/T1_images/BErRecordID_0012_T1.nii').get_fdata()
+
+
+mask = (T1_image[:,:,:] != 0)
 y = np.where(np.any(mask, axis=0))[0]
 y_min, y_max = y[[0, -1]]
 
 x = np.where(np.any(mask, axis=1))[0]
 x_min, x_max = x[[0, -1]]
+
+z = np.where(np.any(mask, axis=2))[0]
+z_min, z_max = z[[0, -1]]
 
 
 plt.imshow(T2_image[x_min:x_max, y_min:y_max, 12])
@@ -43,6 +61,7 @@ print(max_delta_y)
 import nibabel as nib
 import numpy as np
 import matplotlib.pyplot as plt
+
 
 
 T2_image = nib.load('data/raw/T2_images/RecordID_0015_T2_flair.nii').get_fdata()
@@ -93,6 +112,8 @@ plt.imshow(plot_T2)
 plt.gcf().set_size_inches(5, 5)
 plt.style.use('grayscale')
 plt.show()
+
+
 
 
 

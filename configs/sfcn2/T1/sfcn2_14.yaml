@@ -1,5 +1,5 @@
 seed: 0
-exp_name: sfcn2_14_T2_images
+exp_name: sfcn2_14
 
 device:
   cuda_device: cuda
@@ -7,16 +7,16 @@ device:
 
 data:
   cv: 10
-  img_dir: ./data/raw/T2_images                     #path for T2 images
+  img_dir: ./data/raw/T1_images
   fold_dir: ./data/processed/folds
   clip:
     min: 0
-    max: 1250
+    max: 2500
   norm: max_scaler_01
   img_dim:
-    x: 512
-    y: 512
-    z: 47
+    x: 160
+    y: 192
+    z: 160
   model_dir: ./models/cnn
   report_dir: ./reports
   classes:
@@ -27,7 +27,7 @@ data:
 model:
   model_name: SFCN2
   freeze: False
-  pretrained: False                                  #cosi funziona il train
+  pretrained: False   #False--> no pesi
   pretrained_path:  ./models/cnn/pretrained/brain_age.p
 
 trainer:
@@ -38,4 +38,4 @@ trainer:
     mode: min
     patience: 10
   early_stopping: 50
-  max_epochs: 300
+  max_epochs: 1

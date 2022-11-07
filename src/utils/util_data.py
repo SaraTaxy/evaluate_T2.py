@@ -162,7 +162,7 @@ def loader(img_path, img_dim, clip=None, norm=None, step="train"):
 def loader_T2(img_path, img_dim, clip=None, norm=None, step="train"):
     # Img
     img = load_img(img_path)
-    #cropping   --> dx_max/ dy_max
+
     img = cropping_T2(img, 325, 396)
 
     # Clip
@@ -174,8 +174,7 @@ def loader_T2(img_path, img_dim, clip=None, norm=None, step="train"):
             img = img / clip['max']
         elif norm == "minmax_scaler_-11":
             img = (((img - clip['min']) * (1 - (-1))) / (clip['max'] - clip['min'])) + (-1)
-    # Cropping
-    #img = crop_center(img, (img_dim['x'], img_dim['y'], img_dim['z']))
+
     if step == "train":
         img = augmentation(img)
     # To Tensor
@@ -215,4 +214,39 @@ class ImgDataset(torch.utils.data.Dataset):
         # Load data and get label
         img_path = os.path.join(self.img_dir, img_file)
         x = loader(img_path=img_path, img_dim=self.img_dim, clip=self.clip, norm=self.norm, step=self.step)
+        return x, self.class_to_idx[y], id
+
+
+#da integrare con quella sopra --> magari un IF --> chiedi a valerio
+class ImgDataset_T2(torch.utils.data.Dataset):
+    'Characterizes a dataset for PyTorch'
+    def __init__(self, data, classes, cfg_data, step):
+        'Initialization'
+        self.step = step
+        self.img_dir = cfg_data["img_dir"]
+        self.data = data
+        self.classes = classes
+        self.class_to_idx = {c: i for i, c in enumerate(sorted(classes))}
+        self.idx_to_class = {i: c for c, i in self.class_to_idx.items()}
+        # Clip
+        self.clip = cfg_data["clip"]
+        # Norm
+        self.norm = cfg_data["norm"]
+        # Dim
+        self.img_dim = cfg_data["img_dim"]
+
+    def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.data)
+
+    def __getitem__(self, index):
+        'Generates one sample of data'
+        # Select sample
+        row = self.data.iloc[index]
+        id = row.name
+        img_file = row.img
+        y = row.label
+        # Load data and get label
+        img_path = os.path.join(self.img_dir, img_file)
+        x = loader_T2(img_path=img_path, img_dim=self.img_dim, clip=self.clip, norm=self.norm, step=self.step)
         return x, self.class_to_idx[y], id
