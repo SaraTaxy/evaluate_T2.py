@@ -11,70 +11,69 @@ def pad_with(vector, pad_width, iaxis, kwargs):
 
 
 
-def pre_processing_T1(data_path, outFileName):
+def pre_processing(data_path, outFileName):
     d = []  # list info images
     p = 0  # counter images
 
     max_delta_x = 0  # index for the max delta x
     max_delta_y = 0  # index for the max delta y
-    max_delta_z = 0
+
 
     for images in os.listdir(data_path):  # images in the folder
-        dict_mask = {}  # dict for ogni image
-
         path_image = os.path.join(data_path, images)
         if path_image.find('DS_Store') != -1:
             continue
         p = p + 1
-        if p>0:
+        dict_mask = {}
+        if p>300 and p<401:
+                 # dict for ogni image
+
             print(p)
             T2_image = nib.load(path_image).get_fdata()  # load image
 
             mask = (T2_image[:, :, :] != 0)  # create a mask
-            y = np.where(np.any(mask, axis=0))[0]  # value im !=0 y
-            y_min, y_max = y[[0, -1]]  # max and min y
+            x = np.where(np.any(mask, axis=0))[0]  # value im !=0 y
+            x_min, x_max = x[[0, -1]]  # max and min y
 
-            x = np.where(np.any(mask, axis=1))[0]  # value im !=0 x
-            x_min, x_max = x[[0, -1]]  # max and min x
-
-            z = np.where(np.any(mask, axis=1))[0]  # value im !=0 x
-            z_min, z_max = z[[0, -1]]  # max and min x
+            y = np.where(np.any(mask, axis=1))[0]  # value im !=0 x
+            y_min, y_max = y[[0, -1]]  # max and min x
 
             delta_x = x_max - x_min  # calculate dx
             delta_y = y_max - y_min  # calculate dy
-            delta_z = z_max - z_min
+
 
             # dict with characteristich image
             dict_mask = {"num image": p,
                          "image": images,
                          "x": [x_min, x_max],
                          "y": [y_min, y_max],
-                         "z": [z_min, z_max],
                          "delta_x": delta_x,
                          "delta_y": delta_y,
-                         "delta_z": delta_z,
                          "pixel_max": np.amax(T2_image),
-                         "pixel_min": np.amin(T2_image),
-                         "im": T2_image}
-
+                         "pixel_min": np.amin(T2_image)
+                         }
+            a=p
             d.append(dict_mask)  # final list
 
+
     f = open(outFileName, "w")
+    f.write(str(a))
+    f.write('\n')
     for elem in d:
-        #f.write(str(elem))
+        f.write(str(elem))
+        f.write('\n')
+        '''
         if elem['delta_x'] > max_delta_x:
             max_delta_x = elem["delta_x"]
             id_max_delta_x = elem["image"]
         if elem['delta_y'] > max_delta_y:
             max_delta_y = elem["delta_y"]
             id_max_delta_y = elem["image"]
-        if elem['delta_z'] > max_delta_z:
-            max_delta_z = elem["delta_z"]
-            id_max_delta_z = elem["image"]
+
         # crop image in the center
-        x_star = int(max_delta_x / 2)
-        y_star = int(max_delta_y / 2)
-        z_star = int(max_delta_z / 2)
+        x_star = int(max_delta_x/ 2)
+        y_star = int(max_delta_y/2)
+
 
     f.write('\n')
     f.write("----------------------------------------DIM MASK MAX VOLUM IMAGE-----------------------------------------------------")
@@ -91,12 +90,7 @@ def pre_processing_T1(data_path, outFileName):
     f.write("delta_y: ")
     f.write(str(max_delta_y))
     f.write('\n')
-    f.write("index image z max: ")
-    f.write(str(id_max_delta_z))
-    f.write('\n')
-    f.write("delta_z: ")
-    f.write(str(max_delta_z))
-    f.write('\n')
+
     for i in d:
         x_min_im = int(i['x'][0]) + int(i['delta_x'] / 2) - x_star
         x_max_im = int(i['x'][0]) + int(i['delta_x'] / 2) + x_star
@@ -104,25 +98,55 @@ def pre_processing_T1(data_path, outFileName):
         y_min_im = int(i['y'][0]) + int(i['delta_y'] / 2) - y_star
         y_max_im = int(i['y'][0]) + int(i['delta_y'] / 2) + y_star
 
-        z_min_im = int(i['z'][0]) + int(i['delta_z'] / 2) - z_star
-        z_max_im = int(i['z'][0]) + int(i['delta_z'] / 2) + z_star
 
-        T2_image_final = i['im'][x_min_im:x_max_im, y_min_im:y_max_im, z_min_im:z_max_im]
 
-        #T2_image_final = np.pad(T2_image_final, 5, pad_with)
+        T2_image_final = i['im'][x_min_im:x_max_im, y_min_im:y_max_im,:]
 
-        #T2_image_final = T2_image_final[:, :, :]
+        T2_image_final = np.pad(T2_image_final, 5, pad_with)
+
+        T2_image_final = T2_image_final[:, :, :]
     f.write("Dimensioni immagine finale   ")
     f.write(str(np.shape(T2_image_final)))
     f.write('\n')
+'''
+
+
+data_path = "data/raw/T2_images"
+outFileName = "./pre processing/pre_processing_T2_images/mask_dimension_T2_images_300_400.txt"
+
+
+pre_processing(data_path,outFileName)
 
 
 
-data_path = "data/raw/T1_images"
-outFileName = "./pre_processing_T1_images/mask_dimension_T1_images_final_1.txt"
 
 
-pre_processing_T1(data_path,outFileName)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -197,9 +221,9 @@ f.write('\n')
 f.write("index image y max: ")
 f.write(str(id_max_delta_y))
 f.write('\n')
-f.write("delta_y: ")
-f.write(str(max_delta_y))
-f.write('\n')
+#f.write("delta_y: ")
+#f.write(str(max_delta_y))
+#f.write('\n')
 # crop image in the center
 x_star = int(max_delta_x / 2)
 y_star = int(max_delta_y / 2)

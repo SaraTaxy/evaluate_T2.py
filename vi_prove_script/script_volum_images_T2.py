@@ -105,6 +105,7 @@ with open("esempio.txt", 'w') as f:
 
 
 
+
 #print 1 slice
 layer=27
 plot_T2 = T2_image[:,:,layer]

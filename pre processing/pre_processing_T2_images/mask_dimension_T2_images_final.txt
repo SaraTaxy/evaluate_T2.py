@@ -1,80 +1,84 @@
 
-----------------------------------------DIM MASK MAX VOLUM IMAGE-----------------------------------------------------
-index image x max: RecordID_0024_T2_flair.nii
-delta_x: 316
-index image y max: RecordID_0228_T2_flair.nii
-delta_y: 387
-Dimensioni immagine finale   (326, 396, 46)
-
-
-
-
 -------------- 1 - 100 Dim MASK MAX VOLUM ------------------------------------------------------------------------------
-index image x max: RecordID_0024_T2_flair.nii
-delta_x: 316
-index image y max: RecordID_0228_T2_flair.nii
-delta_y: 387
+index image x max: RecordID_0228_T2_flair.nii
+delta_x: 387
+index image y max: RecordID_0024_T2_flair.nii
+delta_y: 316
+Dimensioni immagine finale   (396, 326, 57)
 
 ---------------------------------------- 100 - 200 DIM MASK MAX VOLUM IMAGE---------------------------------------------
-index image x max: RecordID_0711_T2_flair.nii
-delta_x: 322
-index image y max: RecordID_0557_T2_flair.nii
-delta_y: 393
+index image x max: RecordID_0557_T2_flair.nii
+delta_x: 393
+index image y max: RecordID_0711_T2_flair.nii
+delta_y: 322
+Dimensioni immagine finale   (402, 332, 57)
 
 ------------------------- 200 - 300 DIM MASK MAX VOLUM IMAGE------------------------------------------------------------
-index image x max: RecordID_1387_T2_flair.nii
-delta_x: 322
-index image y max: RecordID_1260_T2_flair.nii
-delta_y: 386
+index image x max: RecordID_1260_T2_flair.nii
+delta_x: 386
+index image y max: RecordID_1387_T2_flair.nii
+delta_y: 322
+Dimensioni immagine finale   (396, 332, 57)
+
 
 ---------------------------------------- 300 - 400 DIM MASK MAX VOLUM IMAGE---------------------------------------------
-index image x max: RecordID_2180_T2_flair.nii
-delta_x: 331
-index image y max: RecordID_2120_T2_flair.nii
-delta_y: 396
+index image x max: RecordID_2120_T2_flair.nii
+delta_x: 396
+index image y max: RecordID_2180_T2_flair.nii
+delta_y: 331
+Dimensioni immagine finale   (406, 340, 57)
 
 ---------------------------------------- 400 - 500 DIM MASK MAX VOLUM IMAGE---------------------------------------------
-index image x max: RecordID_3381_T2_flair.nii
-delta_x: 322
-index image y max: RecordID_2914_T2_flair.nii
-delta_y: 390
+index image x max: RecordID_2914_T2_flair.nii
+delta_x: 390
+index image y max: RecordID_3381_T2_flair.nii
+delta_y: 322
+Dimensioni immagine finale   (400, 332, 57)
+
 
 ---------------------------------------- 500 - 600 DIM MASK MAX VOLUM IMAGE---------------------------------------------
-index image x max: RecordID_3959_T2_flair.nii
-delta_x: 323
-index image y max: RecordID_3968_T2_flair.nii
-delta_y: 387
+index image x max: RecordID_3968_T2_flair.nii
+delta_x: 387
+index image y max: RecordID_3959_T2_flair.nii
+delta_y: 323
+Dimensioni immagine finale   (396, 332, 57)
+
 
 --------------------------------------- 600 - 700 DIM MASK MAX VOLUM IMAGE----------------------------------------------
-index image x max: RecordID_4838_T2_flair.nii
-delta_x: 325
-index image y max: RecordID_4381_T2_flair.nii
-delta_y: 387
+index image x max: RecordID_4381_T2_flair.nii
+delta_x: 387
+index image y max: RecordID_4838_T2_flair.nii
+delta_y: 325
+Dimensioni immagine finale   (396, 334, 57)
 
 --------------------------------------- 700 - 800 DIM MASK MAX VOLUM IMAGE----------------------------------------------
-index image x max: RecordID_5040_T2_flair.nii
-delta_x: 310
-index image y max: RecordID_5082_T2_flair.nii
-delta_y: 393
+index image x max: RecordID_5082_T2_flair.nii
+delta_x: 393
+index image y max: RecordID_5040_T2_flair.nii
+delta_y: 310
+Dimensioni immagine finale   (402, 320, 57)
+
 
 ---------------------------------------- 800 - 888 DIM MASK MAX VOLUM IMAGE---------------------------------------------
-index image x max: RecordID_5969_T2_flair.nii
-delta_x: 314
-index image y max: RecordID_6410_T2_flair.nii
-delta_y: 386
+index image x max: RecordID_6410_T2_flair.nii
+delta_x: 386
+index image y max: RecordID_5969_T2_flair.nii
+delta_y: 314
+Dimensioni immagine finale   (396, 324, 57)
+
 
 
 
 ------------------------------------------------------------------------------------------------------------------------
 DIM MASK MAX VOLUM:
 
-index image x max: RecordID_4838_T2_flair.nii
-delta_x: 325
+index image x max: RecordID_2120_T2_flair.nii
+delta_x: 396
 
-index image y max: RecordID_2120_T2_flair.nii
-delta_y: 396
+index image y max: RecordID_2180_T2_flair.nii
+delta_y: 331
 
-dim im final : (335, 406, 46)  --> added 5 pixel on left and right on x and y
+dim im final : (406, 341, 46)  --> added 5 pixel on left and right on x and y
 
 max pixel index image: RecordID_6038_T2_flair.nii
 max pixel: 3619.0

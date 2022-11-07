@@ -95,31 +95,45 @@ def pad_with(vector, pad_width, iaxis, kwargs):
 def cropping_T2(img, delta_x_max, delta_y_max):
 
     mask = (img[:, :, :] != 0)  # create a mask
-    y = np.where(np.any(mask, axis=0))[0]  # value im !=0 y
-    y_min, y_max = y[[0, -1]]              # max and min y
+    x = np.where(np.any(mask, axis=0))[0]  # value im !=0 x
+    x_min, x_max = x[[0, -1]]  # max and min x
+    # print(x_min, x_max)
 
-    x = np.where(np.any(mask, axis=1))[0]  # value im !=0 x
-    x_min, x_max = x[[0, -1]]              # max and min x
+    y = np.where(np.any(mask, axis=1))[0]  # value im !=0 y
+    y_min, y_max = y[[0, -1]]  # max and min y
+    # print(y_min, y_max)
 
-    x_star = int(delta_x_max/2)                # required to have the same size as parallelepiped along x --> delta_x_max/2
-    y_star = int(delta_y_max/2)                # required to have the same size as parallelepiped along y --> delta_y_max/2
+    delta_x = x_max - x_min  # calculate dx
+    delta_y = y_max - y_min
 
-    delta_x_imag = int((x_max - x_min)/2)  # find delta_x image i-esim
-    delta_y_imag = int((y_max - y_min)/2)  # find delta_y image i-esim
+    x_star = round(delta_x_max / 2)  # required to have the same size as parallelepiped along x --> delta_x_max/2
+    y_star = round(delta_y_max / 2)  # required to have the same size as parallelepiped along y --> delta_y_max/2
 
-    x_min_im = x_min + delta_x_imag - x_star - 1  # find the x min for the new image cropped
-    x_max_im = x_min + delta_x_imag + x_star      # find the x max for the new image cropped
+    delta_x_imag = int((x_max - x_min) / 2)  # find delta_x image i-esim
+    delta_y_imag = int((y_max - y_min) / 2)  # find delta_y image i-esim
 
-    y_min_im = y_min + delta_y_imag - y_star - 1  # find the y min for the new image cropped
-    y_max_im = y_min + delta_y_imag + y_star      # find the y max for the new image cropped
+    x_min_im = (x_min + delta_x_imag) - x_star  # find the x min for the new image cropped
+
+    x_max_im = (x_min + delta_x_imag) + x_star  # find the x max for the new image cropped
+    print(x_min_im, x_max_im)
+
+    y_min_im = (y_min + delta_y_imag) - y_star  # find the y min for the new image cropped
+
+    y_max_im = (y_min + delta_y_imag) + y_star  # find the y max for the new image cropped
+    print(y_min_im, y_max_im)
 
 
-    T2_image_final = img[x_min_im:x_max_im, y_min_im:y_max_im, :]  # image final
-    T2_image_final = np.pad(T2_image_final, 5, pad_with)           # zero padding --> addition of null pixels to the image
-    T2_image_cropped = T2_image_final[:, :, 0:47]
-    #print(T2_image_cropped.shape)
+    #risistema le variabili
 
-    return T2_image_cropped
+    T2_image_final_1 = img[y_min_im:y_max_im, x_min_im:x_max_im, :]  # image final
+
+    T2_image_final = np.pad(T2_image_final_1, 5, pad_with)  # zero padding --> addition of null pixels to the image
+
+    # print(T2_image_cropped.shape)
+
+    return T2_image_final
+
+
 
 
 def augmentation(img):
