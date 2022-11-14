@@ -14,15 +14,15 @@ data:
     max: 1250
   norm: max_scaler_01
   img_dim:
-    x: 512
-    y: 512
-    z: 47
+    x: 331
+    y: 396
+    z: 101
   model_dir: ./models/cnn
   report_dir: ./reports
   classes:
     - 1
     - 4
-  batch_size: 16
+  batch_size: 1
 
 model:
   model_name: SFCN2

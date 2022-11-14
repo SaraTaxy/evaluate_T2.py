@@ -50,6 +50,7 @@ def cropping_T2(img, delta_x_max, delta_y_max):
 
     T2_image_final = np.pad(T2_image_final_1, 5, pad_with)           # zero padding --> addition of null pixels to the image
 
+    print(T2_image_final.shape)
     #print(T2_image_cropped.shape)
 
     return mask, T2_image_final_1, T2_image_final
@@ -86,4 +87,25 @@ plt.imshow(T2_cropped[:,:,layer+5])
 plt.title("zero pad")
 
 
+a = np.zeros(shape=(342,406,22))
+b = np.concatenate((a, T2_cropped), axis=2)
 
+
+# ----
+zeros = np.zeros(shape=(342,406,22))
+new_image = np.dstack((zeros, T2_cropped))
+new_image = np.dstack((new_image, zeros))
+
+
+print(c.shape)
+
+
+
+plt.subplot(1,2,1)
+plt.style.use('grayscale')
+plt.imshow(T2_cropped[:,:,47])
+plt.title("zero pad")
+
+plt.subplot(1,2,2)
+plt.imshow(new_image[:,:,47])
+plt.title("new")

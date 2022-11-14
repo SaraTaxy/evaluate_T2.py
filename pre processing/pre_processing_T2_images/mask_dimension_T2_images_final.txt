@@ -72,11 +72,11 @@ Dimensioni immagine finale   (396, 324, 57)
 ------------------------------------------------------------------------------------------------------------------------
 DIM MASK MAX VOLUM:
 
-index image x max: RecordID_2120_T2_flair.nii
-delta_x: 396
+index image x max: RecordID_2180_T2_flair.nii
+delta_x: 331
 
-index image y max: RecordID_2180_T2_flair.nii
-delta_y: 331
+index image y max: RecordID_2120_T2_flair.nii
+delta_y: 396
 
 dim im final : (406, 341, 46)  --> added 5 pixel on left and right on x and y
 

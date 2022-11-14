@@ -19,13 +19,16 @@ os.environ['TORCH_HOME'] = './models/cnn/pretrained'
 ssl._create_default_https_context = ssl._create_unverified_context
 
 # Configuration file
-args = util_general.get_args()
-args.cfg_file = "./configs/sfcn2/T2/sfcn2_t2_14.yaml"
 
+#vanno commentate su alvis
 cfg_file = "./configs/sfcn2/T2/sfcn2_t2_14.yaml"
 with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 
+args = util_general.get_args()
+args.cfg_file = "./configs/sfcn2/T2/sfcn2_t2_14.yaml"
+with open(cfg_file) as file:
+    cfg = yaml.load(file, Loader=yaml.FullLoader)
 
 # Seed everything
 util_general.seed_all(cfg['seed'])

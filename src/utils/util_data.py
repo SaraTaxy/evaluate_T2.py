@@ -5,6 +5,7 @@ from scipy.ndimage import shift
 import nibabel as nib
 import numpy as np
 from scipy.stats import norm
+import math
 
 
 def seed_worker(worker_id):
@@ -92,48 +93,52 @@ def pad_with(vector, pad_width, iaxis, kwargs):
     vector[-pad_width[1]:] = pad_value
 
 
-def cropping_T2(img, delta_x_max, delta_y_max):
+def cropping_T2(img, z, delta_x_max, delta_y_max):
 
     mask = (img[:, :, :] != 0)  # create a mask
-    x = np.where(np.any(mask, axis=0))[0]  # value im !=0 x
-    x_min, x_max = x[[0, -1]]  # max and min x
+
+    x = np.where(np.any(mask, axis=1))[0]  # value im !=0 y
+    x_min, x_max = x[[0, -1]]  # max and min y
     # print(x_min, x_max)
 
-    y = np.where(np.any(mask, axis=1))[0]  # value im !=0 y
-    y_min, y_max = y[[0, -1]]  # max and min y
+    y = np.where(np.any(mask, axis=0))[0]  # value im !=0 x
+    y_min, y_max = y[[0, -1]]  # max and min x
     # print(y_min, y_max)
 
     delta_x = x_max - x_min  # calculate dx
     delta_y = y_max - y_min
 
-    x_star = round(delta_x_max / 2)  # required to have the same size as parallelepiped along x --> delta_x_max/2
-    y_star = round(delta_y_max / 2)  # required to have the same size as parallelepiped along y --> delta_y_max/2
+    x_star = math.floor(delta_x_max / 2)  # required to have the same size as parallelepiped along x --> delta_x_max/2
+    y_star = math.floor(delta_y_max / 2)  # required to have the same size as parallelepiped along y --> delta_y_max/2
 
-    delta_x_imag = int((x_max - x_min) / 2)  # find delta_x image i-esim
-    delta_y_imag = int((y_max - y_min) / 2)  # find delta_y image i-esim
+    delta_x_img = math.floor(delta_x / 2)  # find delta_x image i-esim
+    delta_y_img = math.floor(delta_y / 2)  # find delta_y image i-esim
 
-    x_min_im = (x_min + delta_x_imag) - x_star  # find the x min for the new image cropped
+    x_min_im = (x_min + delta_x_img) - x_star  # find the x min for the new image cropped
+    x_max_im = (x_min + delta_x_img) + x_star  # find the x max for the new image cropped
+    #print(x_min_im, x_max_im)
 
-    x_max_im = (x_min + delta_x_imag) + x_star  # find the x max for the new image cropped
-    print(x_min_im, x_max_im)
-
-    y_min_im = (y_min + delta_y_imag) - y_star  # find the y min for the new image cropped
-
-    y_max_im = (y_min + delta_y_imag) + y_star  # find the y max for the new image cropped
-    print(y_min_im, y_max_im)
+    y_min_im = (y_min + delta_y_img) - y_star  # find the y min for the new image cropped
+    y_max_im = (y_min + delta_y_img) + y_star  # find the y max for the new image cropped
+    #print(y_min_im, y_max_im)
 
 
-    #risistema le variabili
+    # risistema le variabili
+    T2_image_final_1 = img[x_min_im:x_max_im, y_min_im:y_max_im, :]  # image final
 
-    T2_image_final_1 = img[y_min_im:y_max_im, x_min_im:x_max_im, :]  # image final
+    T2_image_final_2 = np.pad(T2_image_final_1, 5, pad_with)  # zero padding --> addition of null pixels to the image
 
-    T2_image_final = np.pad(T2_image_final_1, 5, pad_with)  # zero padding --> addition of null pixels to the image
+    dim_x = np.shape(T2_image_final_2)[0]
+    dim_y = np.shape(T2_image_final_2)[1]
+    dim_z = math.floor((z - (np.shape(T2_image_final_2)[2]))/2)
 
-    # print(T2_image_cropped.shape)
+    zeros = np.zeros(shape=(dim_x, dim_y, dim_z))
+    T2_image_final = np.dstack((zeros, T2_image_final_2))
+    T2_image_final = np.dstack((T2_image_final, zeros))
+
+    print(T2_image_final.shape)
 
     return T2_image_final
-
-
 
 
 def augmentation(img):
@@ -177,7 +182,8 @@ def loader_T2(img_path, img_dim, clip=None, norm=None, step="train"):
     # Img
     img = load_img(img_path)
 
-    img = cropping_T2(img, 325, 396)
+    # Cropping
+    img = cropping_T2(img, img_dim['x'], img_dim['y'])
 
     # Clip
     if clip:
@@ -231,7 +237,7 @@ class ImgDataset(torch.utils.data.Dataset):
         return x, self.class_to_idx[y], id
 
 
-#da integrare con quella sopra --> magari un IF --> chiedi a valerio
+
 class ImgDataset_T2(torch.utils.data.Dataset):
     'Characterizes a dataset for PyTorch'
     def __init__(self, data, classes, cfg_data, step):

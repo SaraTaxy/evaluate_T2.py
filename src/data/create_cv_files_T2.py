@@ -7,15 +7,15 @@ import yaml
 import src.utils.util_general as util_general
 
 # Configuration file
-'''args = util_general.get_args()
-args.cfg_file = ".configs/sfcn2/T2/sfcn2_t2_14.yaml"
-with open(args.cfg_file) as file:
+args = util_general.get_args()
+args.cfg_file = "./configs/sfcn2/T2/sfcn2_t2_14.yaml"
+with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 '''
-
 cfg_file = "./configs/sfcn2/T2/sfcn2_t2_14.yaml"
 with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
+'''
 
 # Seed Everything
 util_general.seed_all(cfg['seed'])
@@ -30,7 +30,7 @@ cv = cfg['data']['cv']
 # Files and Directories
 fold_file = os.path.join("./data/processed", "class_folds")
 data_dir = "./data/processed"
-fold_dir = os.path.join(data_dir, "folds", task)         ###??? chiedi a valerio --> è per leggere i pazienti nelle diverse fold?
+fold_dir = os.path.join(data_dir, "folds", task)
 util_general.create_dir(fold_dir)
 
 # Load data
@@ -45,7 +45,7 @@ with open(os.path.join(fold_dir, 'all.txt'), 'w') as file:
     file.write("id\timg\tlabel\n")
     for patient in fold_data.index:
         label = fold_data.loc[patient, y_label]
-        row = "%s\tBErRecordID_%s_T1.nii\t%s\n" % (patient, patient, label)
+        row = "%s\tRecordID_%s_T2_flair.nii\t%s\n" % (patient, patient, label)
         file.write(row)
 
 # create split dir
@@ -61,5 +61,5 @@ for fold in range(cv):
             file.write("id\timg\tlabel\n")
             for patient in fold_data_step.index:
                 label = fold_data_step.loc[patient, y_label].item()
-                row = "%s\tBErRecordID_%s_T1.nii\t%s\n" % (patient, patient, label)
+                row = "%s\tRecordID_%s_T2_flair.nii\t%s\n" % (patient, patient, label)
                 file.write(row)
