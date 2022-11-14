@@ -93,7 +93,7 @@ def pad_with(vector, pad_width, iaxis, kwargs):
     vector[-pad_width[1]:] = pad_value
 
 
-def cropping_T2(img, z, delta_x_max, delta_y_max):
+def cropping_T2(img, delta_x_max, delta_y_max, delta_z):
 
     mask = (img[:, :, :] != 0)  # create a mask
 
@@ -130,7 +130,7 @@ def cropping_T2(img, z, delta_x_max, delta_y_max):
 
     dim_x = np.shape(T2_image_final_2)[0]
     dim_y = np.shape(T2_image_final_2)[1]
-    dim_z = math.floor((z - (np.shape(T2_image_final_2)[2]))/2)
+    dim_z = math.floor((delta_z - (np.shape(T2_image_final_2)[2]))/2)
 
     zeros = np.zeros(shape=(dim_x, dim_y, dim_z))
     T2_image_final = np.dstack((zeros, T2_image_final_2))
@@ -183,7 +183,7 @@ def loader_T2(img_path, img_dim, clip=None, norm=None, step="train"):
     img = load_img(img_path)
 
     # Cropping
-    img = cropping_T2(img, img_dim['x'], img_dim['y'])
+    img = cropping_T2(img, img_dim['x'], img_dim['y'], img_dim['z'])
 
     # Clip
     if clip:
