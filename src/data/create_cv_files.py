@@ -8,8 +8,13 @@ import src.utils.util_general as util_general
 
 # Configuration file
 args = util_general.get_args()
-args.cfg_file = "./configs/sfcn/sfcn_14.yaml"
+args.cfg_file = "./configs/resnet18/T1/resnet18_14.yaml"
 with open(args.cfg_file) as file:
+    cfg = yaml.load(file, Loader=yaml.FullLoader)
+
+# in locale
+cfg_file = "./configs/resnet18/T1/resnet18_14.yaml"
+with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 
 # Seed Everything
@@ -23,8 +28,8 @@ y_label = "Final"
 cv = cfg['data']['cv']
 
 # Files and Directories
-fold_file = os.path.join("./data/processed", "class_folds")
-data_dir = "./data/processed"
+fold_file = os.path.join("./data/processed/T1", "class_folds")
+data_dir = "./data/processed/T1"
 fold_dir = os.path.join(data_dir, "folds", task)         ###??? chiedi a valerio --> è per leggere i pazienti nelle diverse fold?
 util_general.create_dir(fold_dir)
 

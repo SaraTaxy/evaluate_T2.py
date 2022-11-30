@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 
 class SFCN(nn.Module):
-    def __init__(self, channel_number=[32, 64, 128, 256, 256, 64], output_dim=40, dropout=True):
+    def __init__(self, channel_number=[32, 64, 128, 256, 256, 64], output_dim=40, dropout=True, avg_shape_T2=[5,6,5]):
         super(SFCN, self).__init__()
         n_layer = len(channel_number)
         self.feature_extractor = nn.Sequential()
@@ -29,7 +29,7 @@ class SFCN(nn.Module):
                                                                   kernel_size=1,
                                                                   padding=0))
         self.classifier = nn.Sequential()
-        avg_shape = [5, 6, 5]
+        avg_shape = avg_shape_T2                           #per le immagini T2 --> [6,7,3] / per le immagini T1 [5,6,5]
         self.classifier.add_module('average_pool', nn.AvgPool3d(avg_shape))
         if dropout is True:
             self.classifier.add_module('dropout', nn.Dropout(0.5))
@@ -64,7 +64,7 @@ class SFCN(nn.Module):
 
 
 class SFCN2(nn.Module):
-    def __init__(self, channel_number=[32, 64, 128, 256, 256, 64], output_dim=2, dropout=True):
+    def __init__(self, channel_number=[32, 64, 128, 256, 256, 64], output_dim=2, dropout=True, fc_size=768):
         super(SFCN2, self).__init__()
         n_layer = len(channel_number)
         self.feature_extractor = nn.Sequential()
@@ -90,7 +90,7 @@ class SFCN2(nn.Module):
                                                                   padding=0))
         self.feature_extractor.add_module('max_pool', nn.MaxPool3d(2, stride=2))
         self.classifier = nn.Sequential()
-        self.classifier.add_module('fc_1', nn.Linear(768, 100))
+        self.classifier.add_module('fc_1', nn.Linear(fc_size, 100))                    #768 --> per immagini T1 or 1920 --> per immagini T2
         self.classifier.add_module('relu', nn.ReLU())
         if dropout is True:
             self.classifier.add_module('dropout_2', nn.Dropout(0.5))

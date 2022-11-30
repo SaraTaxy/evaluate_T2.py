@@ -1,0 +1,52 @@
+seed: 0
+exp_name: resnetfc18_14
+
+device:
+  cuda_device: cuda
+  gpu_num_workers: 32
+
+data:
+  cv: 10
+  img_dir_T1: ./data/raw/T1_images
+  img_dir_T2: ./data/raw/T2_images
+
+  #da modificare
+  fold_dir: ./data/processed/folds
+
+  clip:
+    min: 0
+    max: 2500
+  norm: minmax_scaler_-11
+
+  img_dim_T1:
+    x: 160
+    y: 192
+    z: 160
+
+  img_dim_T2:
+    x: 160
+    y: 192
+    z: 160
+
+  model_dir: ./models/cnn
+  report_dir: ./reports
+  classes:
+    - 1
+    - 4
+  batch_size: 16
+
+model:
+  model_name: resnetfc18
+  freeze: False
+  pretrained: True
+  pretrained_path:  ./models/cnn/pretrained/resnet_18_23dataset.pth
+
+trainer:
+  optimizer:
+    lr: 0.001
+    weight_decay: 0.00001
+  scheduler:
+    mode: min
+    patience: 10
+  early_stopping: 50
+  max_epochs: 300

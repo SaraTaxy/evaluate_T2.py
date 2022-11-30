@@ -1,0 +1,42 @@
+seed: 0
+exp_name: efficientnet-b1_14
+
+device:
+  cuda_device: cuda
+  gpu_num_workers: 32
+
+data:
+  cv: 10
+  img_dir: ./data/raw/T2_images
+  fold_dir: ./data/processed/folds
+  clip:
+    min: 0
+    max: 1250
+  norm: minmax_scaler_-11
+  img_dim:
+    x: 331
+    y: 396
+    z: 101
+  model_dir: ./models/cnn
+  report_dir: ./reports
+  classes:
+    - 1
+    - 4
+  batch_size: 6
+
+model:
+  model_name: efficientnet-b1
+  fc_size: 1920
+  freeze: False
+  pretrained: False
+  pretrained_path:
+
+trainer:
+  optimizer:
+    lr: 0.001
+    weight_decay: 0.00001
+  scheduler:
+    mode: min
+    patience: 10
+  early_stopping: 50
+  max_epochs: 300

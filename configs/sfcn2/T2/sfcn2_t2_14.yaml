@@ -22,12 +22,13 @@ data:
   classes:
     - 1
     - 4
-  batch_size: 1
+  batch_size: 1                                  #per farlo girare in locale 1
 
 model:
   model_name: SFCN2
+  fc_size: 1920
   freeze: False
-  pretrained: False                                  #cosi funziona il train
+  pretrained: True                                 #con false funziona il train
   pretrained_path:  ./models/cnn/pretrained/brain_age.p
 
 trainer:

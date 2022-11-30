@@ -18,15 +18,15 @@ cd /mimer/NOBACKUP/groups/inphai/sara/saraenv
 source bin/activate         #
 
 # Executes the code - HERE YOULL NEED TO CHANGE TO YOUR FOLDER
-cd /mimer/NOBACKUP/groups/inphai/
+cd /mimer/NOBACKUP/groups/inphai/sara
 # Train
-python3 ./src/model/train_model.py -f ./configs/sfcn/sfcn_14.yaml
+python3 ./src/model/train_model_T2.py -f ./configs/sfcn/T2/sfcn_14.yaml
 
 # Predict
-python3 ./src/model/prediction_model.py -f ./configs/sfcn/sfcn_14.yaml
+python3 ./src/model/prediction_model_T2.py -f ./configs/T2/sfcn/sfcn_14.yaml
 
 # Evaluate
-python3 ./src/model/evaluate.py -f ./configs/sfcn/sfcn_14.yaml
+python3 ./src/model/evaluate_T2.py -f ./configs/sfcn/T2/sfcn_14.yaml
 
 
 # Deactivate venv

@@ -29,6 +29,7 @@ model:
   freeze: False
   pretrained: False   #False--> no pesi
   pretrained_path:  ./models/cnn/pretrained/brain_age.p
+  fc_size: 768
 
 trainer:
   optimizer:
