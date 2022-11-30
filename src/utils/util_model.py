@@ -18,6 +18,7 @@ import src.utils.util_general as util_general
 import src.utils.sfcn as sfcn
 import src.utils.resnet as resnet
 #import src.utils.resnetsfcn as resnetsfcn
+import src.utils.MMTM_prova as fusion
 
 
 def freeze_layer_parameters(model, freeze_layers):
@@ -29,6 +30,7 @@ def freeze_layer_parameters(model, freeze_layers):
 def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True):
     if model_name == "SFCN":
         model = sfcn.SFCN()
+        #model = sfcn.SFCN(avg_shape_T2=cfg_model["avg_shape_T2"])
         model = torch.nn.DataParallel(model)
         if cfg_model["pretrained"]:
             if state_dict:
@@ -42,7 +44,7 @@ def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True
         num_ftrs = model.classifier[-1].in_channels
         model.classifier[-1] = nn.Conv3d(num_ftrs, num_classes, padding=0, kernel_size=1)  #numero di classi 2
     elif model_name == "SFCN2":
-        model = sfcn.SFCN2(output_dim=num_classes)
+        model = sfcn.SFCN2(output_dim=num_classes, fc_size=cfg_model["fc_size"])
         model = torch.nn.DataParallel(model)
         if cfg_model["pretrained"]:
             pretrained_dict = torch.load(cfg_model["pretrained_path"], map_location=device)
@@ -149,9 +151,13 @@ def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True
             model = monai.networks.nets.SEResNext101(spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
     #elif model_name == "highresnet": #todo: highresnet
         #model = torch.hub.load('fepegar/highresnet', 'highres3dnet', pretrained=True, in_channels=1, out_channels=1)
+    elif model_name == "FusionNetwork":
+        network_name = resnet.resnet18(spatial_dims=3, num_classes=num_classes)
+        model = fusion.FusionNetwork(network_name)
     else:
         print("Invalid model name, exiting...")
         exit()
+
 
     return model
 
@@ -221,6 +227,7 @@ def train_model(model, criterion, optimizer, scheduler, model_name, data_loaders
     early_stop = False
 
     for epoch in range(cfg_trainer["max_epochs"]):
+        #break
         print('Epoch {}/{}'.format(epoch, cfg_trainer["max_epochs"] - 1))
         print('-' * 10)
 
@@ -237,6 +244,7 @@ def train_model(model, criterion, optimizer, scheduler, model_name, data_loaders
             # Iterate over data
             with tqdm(total=len(data_loaders[phase].dataset), desc=f'Epoch {epoch + 1}/{cfg_trainer["max_epochs"]}', unit='img') as pbar:
                 for inputs, labels, file_names in data_loaders[phase]:
+                    #break
                     inputs = inputs.to(device)
                     labels = labels.to(device)
 
@@ -246,7 +254,8 @@ def train_model(model, criterion, optimizer, scheduler, model_name, data_loaders
                     # forward
                     # track history if only in train
                     with torch.set_grad_enabled(phase == 'train'):
-                        outputs = model(inputs.float())
+                        outputs = model(inputs.float())    #due input
+
                         _, preds = torch.max(outputs, 1)
                         loss = criterion(outputs, labels)
                         pbar.set_postfix(**{'loss (batch)': loss.item()})
@@ -264,6 +273,7 @@ def train_model(model, criterion, optimizer, scheduler, model_name, data_loaders
 
             epoch_loss = running_loss / len(data_loaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(data_loaders[phase].dataset)
+
 
             if phase == 'val':
                 scheduler.step(epoch_loss)
@@ -313,7 +323,7 @@ def train_model(model, criterion, optimizer, scheduler, model_name, data_loaders
     return model, history
 
 
-def train_model_multi(model, criterion, optimizer, scheduler, model_name, data_loaders, model_dir, device, cfg_trainer):
+def train_model_fusion(model, criterion, optimizer, scheduler, model_name, data_loaders, model_dir, device, cfg_trainer):
     since = time.time()
 
     best_model_wts = copy.deepcopy(model.state_dict())
@@ -700,3 +710,193 @@ def get_performance(results, performance_dir):
     performance.to_excel(os.path.join(performance_dir, "performance.xlsx"))
 
     return performance
+
+
+
+
+
+
+
+
+
+
+#train model Fusion
+
+def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, model_name, data_loaders, model_dir, device, cfg_trainer, cfg_batch_size):
+    since = time.time()
+
+    best_model_wts = copy.deepcopy(model.state_dict())
+    best_loss = np.Inf
+
+    history = {'train_loss': [], 'val_loss': [], 'train_acc': [], 'val_acc': []}
+
+    epochs_no_improve = 0
+    early_stop = False
+
+    for epoch in range(cfg_trainer["max_epochs"]):
+        #break
+        print('Epoch {}/{}'.format(epoch, cfg_trainer["max_epochs"] - 1))
+        print('-' * 10)
+
+        # Each epoch has a training and validation phase
+        for phase in ['train', 'val']:
+            if phase == 'train':
+                model.train()  # Set model to training mode
+            else:
+                model.eval()   # Set model to evaluate mode
+
+            running_corrects = 0
+
+            running_loss_1 = 0.0
+            running_loss_2 = 0.0
+
+            # Iterate over data
+            with tqdm(total=len(data_loaders[phase].dataset), desc=f'Epoch {epoch + 1}/{cfg_trainer["max_epochs"]}', unit='img') as pbar:
+
+                for inputs1, inputs2, labels, file_names in data_loaders[phase]:
+                    #break
+                    inputs1 = inputs1.to(device)  #T1
+                    labels = labels.to(device)  #T2
+
+                    inputs2 = inputs2.to(device)
+
+                    # zero the parameter gradients
+                    optimizer.zero_grad()
+
+                    # forward
+                    # track history if only in train
+                    with torch.set_grad_enabled(phase == 'train'):
+                        outputs1, outputs2 = model(inputs1.float(), inputs2.float())    #due input
+
+                        loss1 = criterion_1(outputs1, labels)
+                        loss2 = criterion_2(outputs2, labels)
+
+                        loss = loss1 + loss2
+                        pbar.set_postfix(**{'loss (batch)': loss.item()})
+
+                        softmax = nn.Softmax(dim=1)
+
+                        outputs1 = softmax(outputs1)
+                        outputs2 = softmax(outputs2)
+
+                        for i in range(0, int(cfg_batch_size)):
+                            out = [outputs1[i], outputs2[i]]
+                            media0 = ((out[i][0] + out[i + 1][0]) /2)
+                            media1 = ((out[i][1] + out[i + 1][1]) /2)
+                            if media0 > media1:
+                                preds = 0
+                            else:
+                                preds = 1
+
+                        # backward + optimize only if in training phase
+                        if phase == 'train':
+                            loss.backward()
+                            optimizer.step()
+
+                    # statistics
+                    running_loss_1 += loss.item() * inputs1.size(0)
+                    running_loss_2 += loss.item() * inputs2.size(0)
+
+                    running_loss = running_loss_1 + running_loss_2
+
+                    running_corrects += torch.sum(preds == labels.data)
+
+                    pbar.update(inputs1.shape[0])
+                    pbar.update(inputs2.shape[0])
+
+            epoch_loss = running_loss / len(data_loaders[phase].dataset)
+            epoch_acc = running_corrects.double() / len(data_loaders[phase].dataset)
+
+
+            if phase == 'val':
+                scheduler.step(epoch_loss)
+
+            # update history
+            if phase == 'train':
+                history['train_loss'].append(epoch_loss)
+                history['train_acc'].append(epoch_acc)
+            else:
+                history['val_loss'].append(epoch_loss)
+                history['val_acc'].append(epoch_acc)
+
+            print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
+
+            # Early stopping
+            if phase == 'val':
+                if epoch_loss < best_loss:
+                    best_epoch = epoch
+                    best_loss = epoch_loss
+                    best_model_wts = copy.deepcopy(model.state_dict())
+                    epochs_no_improve = 0
+                else:
+                    epochs_no_improve += 1
+                    # Trigger early stopping
+                    if epochs_no_improve >= cfg_trainer["early_stopping"]:
+                        print(f'\nEarly Stopping! Total epochs: {epoch}%')
+                        early_stop = True
+                        break
+
+        if early_stop:
+            break
+
+    time_elapsed = time.time() - since
+    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+    print('Best epoch: {:0f}'.format(best_epoch))
+    print('Best val Acc: {:4f}'.format(best_loss))
+
+    # load best model weights
+    model.load_state_dict(best_model_wts)
+
+    # Save model
+    torch.save(model, os.path.join(model_dir, "%s.pt" % model_name))
+
+    # Format history
+    history = pd.DataFrame.from_dict(history, orient='index').transpose()
+
+    return model, history
+
+
+def evaluate_fusion(model, data_loader, device, cfg_batch_size):
+
+    # Global and Class Accuracy
+    correct_pred = {classname: 0 for classname in list(data_loader.dataset.idx_to_class.values()) + ["all"]}
+    total_pred = {classname: 0 for classname in list(data_loader.dataset.idx_to_class.values()) + ["all"]}
+
+    # Test loop
+    model.eval()
+    with torch.no_grad():
+        for inputs1, inputs2, labels, file_names in tqdm(data_loader):
+            inputs1 = inputs1.to(device)
+            inputs2 = inputs2.to(device)
+            labels = labels.to(device)
+            # Prediction
+            outputs1 = model(inputs1.float())
+            outputs2 = model(inputs2.float())
+
+            softmax = nn.Softmax(dim=1)
+
+            outputs1 = softmax(outputs1)
+            outputs2 = softmax(outputs2)
+
+            for i in range(0, int(cfg_batch_size)):
+                out = [outputs1[i], outputs2[i]]
+                media0 = (out[i][0] + out[i + 1][0]) / 2
+                media1 = (out[i][1] + out[i + 1][1]) / 2
+                if media0 > media1:
+                    preds = 0
+                else:
+                    preds = 1
+
+            # global
+            correct_pred['all'] += (preds == labels).sum().item()
+            total_pred['all'] += labels.size(0)
+            # class
+            for label, prediction in zip(labels, preds):
+                if label == prediction:
+                    correct_pred[data_loader.dataset.idx_to_class[label.item()]] += 1
+                total_pred[data_loader.dataset.idx_to_class[label.item()]] += 1
+
+    # Accuracy
+    test_results = {k: correct_pred[k] / total_pred[k] for k in correct_pred.keys() & total_pred}
+
+    return test_results

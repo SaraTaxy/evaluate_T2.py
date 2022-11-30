@@ -136,7 +136,7 @@ def cropping_T2(img, delta_x_max, delta_y_max, delta_z):
     T2_image_final = np.dstack((zeros, T2_image_final_2))
     T2_image_final = np.dstack((T2_image_final, zeros))
 
-    print(T2_image_final.shape)
+
 
     return T2_image_final
 
@@ -270,3 +270,131 @@ class ImgDataset_T2(torch.utils.data.Dataset):
         img_path = os.path.join(self.img_dir, img_file)
         x = loader_T2(img_path=img_path, img_dim=self.img_dim, clip=self.clip, norm=self.norm, step=self.step)
         return x, self.class_to_idx[y], id
+
+
+class ImgDataset_T1_Fusion(torch.utils.data.Dataset):
+    'Characterizes a dataset for PyTorch'
+    def __init__(self, data, classes, cfg_data, step):
+        'Initialization'
+        self.step = step
+        self.img_dir = cfg_data["img_dir_T1"]
+        self.data = data
+        self.classes = classes
+        self.class_to_idx = {c: i for i, c in enumerate(sorted(classes))}
+        self.idx_to_class = {i: c for c, i in self.class_to_idx.items()}
+        # Clip
+        self.clip = cfg_data["clip_T1"]
+        # Norm
+        self.norm = cfg_data["norm"]
+        # Dim
+        self.img_dim = cfg_data["img_dim_T1"]
+
+    def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.data)
+
+    def __getitem__(self, index):
+        'Generates one sample of data'
+        # Select sample
+        row = self.data.iloc[index]
+        id = row.name
+        img_file = row.img
+        y = row.label
+        # Load data and get label
+        img_path = os.path.join(self.img_dir, img_file)
+        x = loader(img_path=img_path, img_dim=self.img_dim, clip=self.clip, norm=self.norm, step=self.step)
+        return x, self.class_to_idx[y], id
+
+
+
+class ImgDataset_T2_Fusion(torch.utils.data.Dataset):
+    'Characterizes a dataset for PyTorch'
+    def __init__(self, data, classes, cfg_data, step):
+        'Initialization'
+        self.step = step
+        self.img_dir = cfg_data["img_dir_T2"]
+        self.data = data
+        self.classes = classes
+        self.class_to_idx = {c: i for i, c in enumerate(sorted(classes))}
+        self.idx_to_class = {i: c for c, i in self.class_to_idx.items()}
+        # Clip
+        self.clip = cfg_data["clip_T2"]
+        # Norm
+        self.norm = cfg_data["norm"]
+        # Dim
+        self.img_dim = cfg_data["img_dim_T2"]
+
+    def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.data)
+
+    def __getitem__(self, index):
+        'Generates one sample of data'
+        # Select sample
+        row = self.data.iloc[index]
+        id = row.name
+        img_file = row.img
+        y = row.label
+        # Load data and get label
+        img_path = os.path.join(self.img_dir, img_file)
+        x = loader_T2(img_path=img_path, img_dim=self.img_dim, clip=self.clip, norm=self.norm, step=self.step)
+        return x, self.class_to_idx[y], id
+
+
+
+class ImgDataset_Fusion(torch.utils.data.Dataset):
+    'Characterizes a dataset for PyTorch'
+    def __init__(self, data_T1, data_T2, classes, cfg_data, step):
+        'Initialization'
+        self.step = step
+
+        self.img_dir_T1 = cfg_data["img_dir_T1"]
+        self.img_dir_T2 = cfg_data["img_dir_T2"]
+        self.data_T1 = data_T1
+        self.data_T2 = data_T2
+        self.classes = classes
+        self.class_to_idx = {c: i for i, c in enumerate(sorted(classes))}
+        self.idx_to_class = {i: c for c, i in self.class_to_idx.items()}
+        # Clip
+        self.clip_T1 = cfg_data["clip_T1"]
+        self.clip_T2 = cfg_data["clip_T2"]
+        # Norm
+        self.norm = cfg_data["norm"]
+        # Dim
+        self.img_dim_T1 = cfg_data["img_dim_T1"]
+        self.img_dim_T2 = cfg_data["img_dim_T2"]
+
+    def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.data_T1)
+
+    def __getitem__(self, index):
+        'Generates one sample of data'
+        # Select sample
+        row_1 = self.data_T1.iloc[index]
+        id_1 = row_1.name
+        img_file_1 = row_1.img
+        y_1 = row_1.label
+
+        row_2 = self.data_T2.iloc[index]
+        id_2 = row_2.name
+        img_file_2 = row_2.img
+        y_2 = row_2.label
+
+        if id_1 == id_2:
+            idx = id_1
+        else:
+            idx = id_2
+
+        if y_1 == y_2:
+            y = y_1
+        else:
+            y = y_2
+
+        # Load data and get label
+        img_path_T1 = os.path.join(self.img_dir_T1, img_file_1)
+        img_path_T2 = os.path.join(self.img_dir_T2, img_file_2)
+
+        x1 = loader(img_path=img_path_T1, img_dim=self.img_dim_T1, clip=self.clip_T1, norm=self.norm, step=self.step)
+        x2 = loader_T2(img_path=img_path_T2, img_dim=self.img_dim_T2, clip=self.clip_T2, norm=self.norm, step=self.step)
+        return x1, x2, self.class_to_idx[y], idx

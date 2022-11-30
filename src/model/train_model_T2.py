@@ -20,14 +20,15 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 # Configuration file
 
-#vanno commentate su alvis
-cfg_file = "./configs/sfcn2/T2/sfcn2_t2_14.yaml"
+#locale --> per farlo girare sul pc
+cfg_file = "./configs/resnet18/T2/resnet18_14_t2.yaml"
 with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 
+
+#alvis --> non toccare
 args = util_general.get_args()
-args.cfg_file = "./configs/sfcn2/T2/sfcn2_t2_14.yaml"
-with open(cfg_file) as file:
+with open(args.cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 
 # Seed everything
