@@ -17,8 +17,9 @@ import monai
 import src.utils.util_general as util_general
 import src.utils.sfcn as sfcn
 import src.utils.resnet as resnet
-#import src.utils.resnetsfcn as resnetsfcn
+# import src.utils.resnetsfcn as resnetsfcn
 import src.utils.MMTM_prova as fusion
+import numpy as np
 
 
 def freeze_layer_parameters(model, freeze_layers):
@@ -29,20 +30,21 @@ def freeze_layer_parameters(model, freeze_layers):
 
 def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True):
     if model_name == "SFCN":
-        model = sfcn.SFCN()
-        #model = sfcn.SFCN(avg_shape_T2=cfg_model["avg_shape_T2"])
+        #model = sfcn.SFCN()
+        model = sfcn.SFCN(avg_shape_T2=cfg_model["avg_shape_T2"])
         model = torch.nn.DataParallel(model)
+
         if cfg_model["pretrained"]:
             if state_dict:
                 model.load_state_dict(torch.load(cfg_model["pretrained_path"], map_location=device))
             else:
-                #model = torch.load(cfg_model["pretrained_path"], map_location=device)
+                # model = torch.load(cfg_model["pretrained_path"], map_location=device)
                 model = torch.nn.DataParallel(model)
         model = model.module
         if cfg_model["freeze"]:
             freeze_layer_parameters(model=model, freeze_layers=cfg_model["freeze_layers"])
         num_ftrs = model.classifier[-1].in_channels
-        model.classifier[-1] = nn.Conv3d(num_ftrs, num_classes, padding=0, kernel_size=1)  #numero di classi 2
+        model.classifier[-1] = nn.Conv3d(num_ftrs, num_classes, padding=0, kernel_size=1)  # numero di classi 2
     elif model_name == "SFCN2":
         model = sfcn.SFCN2(output_dim=num_classes, fc_size=cfg_model["fc_size"])
         model = torch.nn.DataParallel(model)
@@ -107,68 +109,93 @@ def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True
         if cfg_model["freeze"]:
             freeze_layer_parameters(model=model, freeze_layers=cfg_model["freeze_layers"])
     elif "densenet" in model_name:
-        if model_name == "densenet121":#try this one first pretrained ==False
-            model = monai.networks.nets.DenseNet121(spatial_dims=3, in_channels=1, out_channels=num_classes, pretrained=cfg_model["pretrained"])
+        if model_name == "densenet121":  # try this one first pretrained ==False
+            model = monai.networks.nets.DenseNet121(spatial_dims=3, in_channels=1, out_channels=num_classes,
+                                                    pretrained=cfg_model["pretrained"])
         elif model_name == "densenet169":
-            model = monai.networks.nets.DenseNet169(spatial_dims=3, in_channels=1, out_channels=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.DenseNet169(spatial_dims=3, in_channels=1, out_channels=num_classes,
+                                                    pretrained=cfg_model["pretrained"])
         elif model_name == "densenet201":
-            model = monai.networks.nets.DenseNet201(spatial_dims=3, in_channels=1, out_channels=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.DenseNet201(spatial_dims=3, in_channels=1, out_channels=num_classes,
+                                                    pretrained=cfg_model["pretrained"])
         elif model_name == "densenet264":
-            model = monai.networks.nets.DenseNet264(spatial_dims=3, in_channels=1, out_channels=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.DenseNet264(spatial_dims=3, in_channels=1, out_channels=num_classes,
+                                                    pretrained=cfg_model["pretrained"])
     elif "efficientnet" in model_name:
-        if model_name == "efficientnet-b0":#try this one first
-            model = monai.networks.nets.EfficientNetBN("efficientnet-b0", spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+        if model_name == "efficientnet-b0":  # try this one first
+            model = monai.networks.nets.EfficientNetBN("efficientnet-b0", spatial_dims=3, in_channels=1,
+                                                       num_classes=num_classes, pretrained=cfg_model["pretrained"])
         elif model_name == "efficientnet-b1":
-            model = monai.networks.nets.EfficientNetBN("efficientnet-b1", spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.EfficientNetBN("efficientnet-b1", spatial_dims=3, in_channels=1,
+                                                       num_classes=num_classes, pretrained=cfg_model["pretrained"])
         elif model_name == "efficientnet-b2":
-            model = monai.networks.nets.EfficientNetBN("efficientnet-b2", spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.EfficientNetBN("efficientnet-b2", spatial_dims=3, in_channels=1,
+                                                       num_classes=num_classes, pretrained=cfg_model["pretrained"])
         elif model_name == "efficientnet-b3":
-            model = monai.networks.nets.EfficientNetBN("efficientnet-b3", spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.EfficientNetBN("efficientnet-b3", spatial_dims=3, in_channels=1,
+                                                       num_classes=num_classes, pretrained=cfg_model["pretrained"])
         elif model_name == "efficientnet-b4":
-            model = monai.networks.nets.EfficientNetBN("efficientnet-b4", spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.EfficientNetBN("efficientnet-b4", spatial_dims=3, in_channels=1,
+                                                       num_classes=num_classes, pretrained=cfg_model["pretrained"])
         elif model_name == "efficientnet-b5":
-            model = monai.networks.nets.EfficientNetBN("efficientnet-b5", spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.EfficientNetBN("efficientnet-b5", spatial_dims=3, in_channels=1,
+                                                       num_classes=num_classes, pretrained=cfg_model["pretrained"])
         elif model_name == "efficientnet-b6":
-            model = monai.networks.nets.EfficientNetBN("efficientnet-b6", spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.EfficientNetBN("efficientnet-b6", spatial_dims=3, in_channels=1,
+                                                       num_classes=num_classes, pretrained=cfg_model["pretrained"])
         elif model_name == "efficientnet-b7":
-            model = monai.networks.nets.EfficientNetBN("efficientnet-b7", spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.EfficientNetBN("efficientnet-b7", spatial_dims=3, in_channels=1,
+                                                       num_classes=num_classes, pretrained=cfg_model["pretrained"])
         elif model_name == "efficientnet-b8":
-            model = monai.networks.nets.EfficientNetBN("efficientnet-b8", spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.EfficientNetBN("efficientnet-b8", spatial_dims=3, in_channels=1,
+                                                       num_classes=num_classes, pretrained=cfg_model["pretrained"])
         elif model_name == "efficientnet-l2":
-            model = monai.networks.nets.EfficientNetBN("efficientnet-l2", spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.EfficientNetBN("efficientnet-l2", spatial_dims=3, in_channels=1,
+                                                       num_classes=num_classes, pretrained=cfg_model["pretrained"])
     elif model_name.startswith("se"):
         if model_name == "senet154":
-            model = monai.networks.nets.SENet154(spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
-        elif model_name == "seresnet50": #try this one first
-            model = monai.networks.nets.SEResNet50(spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.SENet154(spatial_dims=3, in_channels=1, num_classes=num_classes,
+                                                 pretrained=cfg_model["pretrained"])
+        elif model_name == "seresnet50":  # try this one first
+            model = monai.networks.nets.SEResNet50(spatial_dims=3, in_channels=1, num_classes=num_classes,
+                                                   pretrained=cfg_model["pretrained"])
         elif model_name == "seresnet101":
-            model = monai.networks.nets.SEResNet101(spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.SEResNet101(spatial_dims=3, in_channels=1, num_classes=num_classes,
+                                                    pretrained=cfg_model["pretrained"])
         elif model_name == "seresnet152":
-            model = monai.networks.nets.SEResNet152(spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
-        elif model_name == "seresnext50": #try this one first
-            model = monai.networks.nets.SEResNeXt50(spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
+            model = monai.networks.nets.SEResNet152(spatial_dims=3, in_channels=1, num_classes=num_classes,
+                                                    pretrained=cfg_model["pretrained"])
+        elif model_name == "seresnext50":  # try this one first
+            model = monai.networks.nets.SEResNeXt50(spatial_dims=3, in_channels=1, num_classes=num_classes,
+                                                    pretrained=cfg_model["pretrained"])
         elif model_name == "seresnext101":
-            model = monai.networks.nets.SEResNext101(spatial_dims=3, in_channels=1, num_classes=num_classes, pretrained=cfg_model["pretrained"])
-    #elif model_name == "highresnet": #todo: highresnet
-        #model = torch.hub.load('fepegar/highresnet', 'highres3dnet', pretrained=True, in_channels=1, out_channels=1)
-    elif model_name == "FusionNetwork":
-        network_name = resnet.resnet18(spatial_dims=3, num_classes=num_classes)
-        model = fusion.FusionNetwork(network_name)
+            model = monai.networks.nets.SEResNext101(spatial_dims=3, in_channels=1, num_classes=num_classes,
+                                                     pretrained=cfg_model["pretrained"])
+    # elif model_name == "highresnet": #todo: highresnet
+    # model = torch.hub.load('fepegar/highresnet', 'highres3dnet', pretrained=True, in_channels=1, out_channels=1)
+
+        #elif model_name == "FusionNetwork":
+            #network_name_1 = resnet.resnet18(spatial_dims=3, num_classes=num_classes)
+            #network_name_2 = resnet.resnet18(spatial_dim=3, num_classes = num_classes)
+            #model = fusion.FusionNetwork(network_name_1, network_name_2)
+
     else:
         print("Invalid model name, exiting...")
         exit()
 
-
     return model
 
 
-def initialize_joint_model(model_name, num_classes, cfg_model, fold, device):
-    if model_name in ["resnet50SFCN", "resnet50SFCN_prob", "resnet50SFCN_prob_multi"]:
+def initialize_joint_model(fold, model_name, num_classes, cfg_model, device):
+
+    if model_name in ["FusionNetwork", "resnet50SFCN", "resnet50SFCN_prob", "resnet50SFCN_prob_multi"]:
+        print(model_name)
         # Single Models
         if cfg_model['pretrained_1']:
             cfg_model['pretrained'] = True
             if os.path.isdir(cfg_model['pretrained_path_1']):
-                cfg_model['pretrained_path'] = os.path.join(cfg_model['pretrained_path_1'], str(fold), "%s.pt" % cfg_model['model_name_1'])
+                cfg_model['pretrained_path'] = os.path.join(cfg_model['pretrained_path_1'], str(fold),
+                                                            "%s.pt" % model_name)
                 state_dict = False
             if os.path.isfile(cfg_model['pretrained_path_1']):
                 cfg_model['pretrained_path'] = cfg_model['pretrained_path_1']
@@ -177,11 +204,15 @@ def initialize_joint_model(model_name, num_classes, cfg_model, fold, device):
             cfg_model['pretrained'] = False
             cfg_model['pretrained_path'] = None
             state_dict = False
-        model_1 = initialize_model(model_name=cfg_model['model_name_1'], num_classes=num_classes, cfg_model=cfg_model, device=device, state_dict=state_dict)
+
+        model_1 = initialize_model(model_name=cfg_model['model_name_1'], num_classes=num_classes, cfg_model=cfg_model,
+                                   device=device, state_dict=state_dict)
+
         if cfg_model['pretrained_2']:
             cfg_model['pretrained'] = True
             if os.path.isdir(cfg_model['pretrained_path_2']):
-                cfg_model['pretrained_path'] = os.path.join(cfg_model['pretrained_path_2'], str(fold), "%s.pt" % cfg_model['model_name_2'])
+                cfg_model['pretrained_path'] = os.path.join(cfg_model['pretrained_path_2'], str(fold),
+                                                            "%s.pt" % model_name)
                 state_dict = False
             if os.path.isfile(cfg_model['pretrained_path_2']):
                 cfg_model['pretrained_path'] = cfg_model['pretrained_path_2']
@@ -190,14 +221,19 @@ def initialize_joint_model(model_name, num_classes, cfg_model, fold, device):
             cfg_model['pretrained'] = False
             cfg_model['pretrained_path'] = None
             state_dict = False
-        model_2 = initialize_model(model_name=cfg_model['model_name_2'], num_classes=num_classes, cfg_model=cfg_model, device=device, state_dict=state_dict)
+        model_2 = initialize_model(model_name=cfg_model['model_name_2'], num_classes=num_classes, cfg_model=cfg_model,
+                                   device=device, state_dict=state_dict)
         # Joint Models
+        '''
         if model_name == "resnet50SFCN":
             model = resnetsfcn.ResNetSFCN(model_1, model_2, num_classes)
         if model_name == "resnet50SFCN_prob":
             model = resnetsfcn.ResNetSFCN_Prob(model_1, model_2, num_classes)
         if model_name == "resnet50SFCN_prob_multi":
             model = resnetsfcn.ResNetSFCN_Prob_Multi(model_1, model_2, num_classes)
+        '''
+        if model_name == "FusionNetwork":
+            model = fusion.FusionNetwork(model_1, model_2, lista=cfg_model['switch'])
     else:
         print("Invalid model name, exiting...")
         exit()
@@ -227,7 +263,7 @@ def train_model(model, criterion, optimizer, scheduler, model_name, data_loaders
     early_stop = False
 
     for epoch in range(cfg_trainer["max_epochs"]):
-        #break
+        # break
         print('Epoch {}/{}'.format(epoch, cfg_trainer["max_epochs"] - 1))
         print('-' * 10)
 
@@ -236,7 +272,7 @@ def train_model(model, criterion, optimizer, scheduler, model_name, data_loaders
             if phase == 'train':
                 model.train()  # Set model to training mode
             else:
-                model.eval()   # Set model to evaluate mode
+                model.eval()  # Set model to evaluate mode
 
             running_loss = 0.0
             running_corrects = 0
@@ -254,7 +290,7 @@ def train_model(model, criterion, optimizer, scheduler, model_name, data_loaders
                     # forward
                     # track history if only in train
                     with torch.set_grad_enabled(phase == 'train'):
-                        outputs = model(inputs.float())    #due input
+                        outputs = model(inputs.float())  # due input
 
                         _, preds = torch.max(outputs, 1)
                         loss = criterion(outputs, labels)
@@ -273,7 +309,6 @@ def train_model(model, criterion, optimizer, scheduler, model_name, data_loaders
 
             epoch_loss = running_loss / len(data_loaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(data_loaders[phase].dataset)
-
 
             if phase == 'val':
                 scheduler.step(epoch_loss)
@@ -323,7 +358,8 @@ def train_model(model, criterion, optimizer, scheduler, model_name, data_loaders
     return model, history
 
 
-def train_model_fusion(model, criterion, optimizer, scheduler, model_name, data_loaders, model_dir, device, cfg_trainer):
+def train_model_fusion(model, criterion, optimizer, scheduler, model_name, data_loaders, model_dir, device,
+                       cfg_trainer):
     since = time.time()
 
     best_model_wts = copy.deepcopy(model.state_dict())
@@ -343,13 +379,14 @@ def train_model_fusion(model, criterion, optimizer, scheduler, model_name, data_
             if phase == 'train':
                 model.train()  # Set model to training mode
             else:
-                model.eval()   # Set model to evaluate mode
+                model.eval()  # Set model to evaluate mode
 
             running_loss = 0.0
             running_corrects = 0
 
             # Iterate over data
-            with tqdm(total=len(data_loaders[phase].dataset), desc=f'Epoch {epoch + 1}/{cfg_trainer["max_epochs"]}', unit='img') as pbar:
+            with tqdm(total=len(data_loaders[phase].dataset), desc=f'Epoch {epoch + 1}/{cfg_trainer["max_epochs"]}',
+                      unit='img') as pbar:
                 for inputs, labels, file_names in data_loaders[phase]:
                     inputs = inputs.to(device)
                     labels = labels.to(device)
@@ -472,6 +509,7 @@ def evaluate(model, data_loader, device):
     model.eval()
     with torch.no_grad():
         for inputs, labels, file_names in tqdm(data_loader):
+
             inputs = inputs.to(device)
             labels = labels.to(device)
             # Prediction
@@ -487,7 +525,7 @@ def evaluate(model, data_loader, device):
                 total_pred[data_loader.dataset.idx_to_class[label.item()]] += 1
 
     # Accuracy
-    test_results = {k: correct_pred[k]/total_pred[k] for k in correct_pred.keys() & total_pred}
+    test_results = {k: correct_pred[k] / total_pred[k] for k in correct_pred.keys() & total_pred}
 
     return test_results
 
@@ -516,7 +554,7 @@ def evaluate_multi(model, data_loader, device):
                 total_pred[data_loader.dataset.idx_to_class[label.item()]] += 1
 
     # Accuracy
-    test_results = {k: correct_pred[k]/total_pred[k] for k in correct_pred.keys() & total_pred}
+    test_results = {k: correct_pred[k] / total_pred[k] for k in correct_pred.keys() & total_pred}
 
     return test_results
 
@@ -529,6 +567,49 @@ def get_predict_function(output_type='single'):
     else:
         print("Invalid train type, exiting...")
         exit()
+
+def get_predict_function_fusion(output_type='single'):
+    if output_type == 'single':
+        return predict_fusion
+    if output_type == 'multi':
+        return predict_multi
+    else:
+        print("Invalid train type, exiting...")
+        exit()
+
+
+def predict_fusion(model, data_loader, device):
+    # Prediction and Truth
+    predictions = {}
+    probabilities= {}
+    truth = {}
+
+    # Predict loop
+    model.eval()
+    l=[]
+    with torch.no_grad():
+        for inputs1, inputs2, labels, file_names in tqdm(data_loader):
+            inputs1 = inputs1.to(device)
+            inputs2 = inputs2.to(device)
+            labels = labels.to(device)
+            # Prediction
+            outputs1, outputs2 = model(inputs1.float(), inputs2.float())
+            probs1 = nn.functional.softmax(outputs1, 1)
+            probs2 = nn.functional.softmax(outputs2, 1)
+
+            mean_probs = (probs1+probs2)/2
+            _, preds = torch.max(mean_probs, dim=1)
+
+
+            for file_name, label, pred, prob in zip(file_names, labels, preds, mean_probs):
+                predictions[str(file_name.tolist())] = pred.item()
+                probabilities[str(file_name.tolist())] = prob.tolist()
+                truth[str(file_name.tolist())] = label.item()
+
+
+    return predictions, probabilities, truth
+
+
 
 
 def predict(model, data_loader, device):
@@ -546,11 +627,13 @@ def predict(model, data_loader, device):
             # Prediction
             outputs = model(inputs.float())
             probs = nn.functional.softmax(outputs, 1)
+
             _, preds = torch.max(outputs, 1)
             for file_name, label, pred, prob in zip(file_names, labels, preds, probs):
                 predictions[file_name] = pred.item()
                 probabilities[file_name] = prob.tolist()
                 truth[file_name] = label.item()
+
     return predictions, probabilities, truth
 
 
@@ -563,17 +646,36 @@ def predict_multi(model, data_loader, device):
     # Predict loop
     model.eval()
     with torch.no_grad():
-        for inputs, labels, file_names in tqdm(data_loader):
-            inputs = inputs.to(device)
+        for inputs1, inputs2, labels, file_names in tqdm(data_loader):
+
+            inputs1 = inputs1.to(device)
+            inputs2 = inputs2.to(device)
             labels = labels.to(device)
             # Prediction
-            outputs_1, outputs_2, outputs_3 = model(inputs.float())
-            probs = nn.functional.softmax(outputs_3, 1)
-            _, preds = torch.max(outputs_3, 1)
-            for file_name, label, pred, prob in zip(file_names, labels, preds, probs):
-                predictions[file_name] = pred.item()
-                probabilities[file_name] = prob.tolist()
+
+            outputs1, outputs2 = model(inputs1.float(), inputs2.float())
+            probs1 = nn.functional.softmax(outputs1, 1)
+            probs2 = nn.functional.softmax(outputs2, 1)
+
+
+            for i in range(0, len(probs1)):
+                media0 = (probs1[i][0] + probs2[i][0]) / 2
+                media1 = (probs1[i][1] + probs2[i][1]) / 2
+
+                if media0 > media1:
+                    preds = 0
+                else:
+                    preds = 1
+
+                l.append(preds)
+            l = torch.IntTensor(l)
+
+            for file_name, label, preds, prob1, probs2 in zip(file_names, labels, l, probs1, probs2):
+                predictions[file_name] = preds.item()
+                probabilities[file_name] = probs1.tolist()
+                probabilities[file_name] = probs2.tolist()
                 truth[file_name] = label.item()
+
     return predictions, probabilities, truth
 
 
@@ -585,7 +687,7 @@ def get_predictions(prediction_dir, fold_list, steps):
         fold_path = os.path.join(prediction_dir, str(fold))
 
         for Fset in steps:
-
+            # break
             preds_path = os.path.join(fold_path, f"prediction_{Fset}_{fold}.xlsx")
             probs_path = os.path.join(fold_path, f"probability_{Fset}_{fold}.xlsx")
 
@@ -622,14 +724,59 @@ def get_predictions(prediction_dir, fold_list, steps):
 
     return results.sort_index(axis=1)
 
+def get_predictions_FUSION(prediction_dir, fold_list, steps):
+    results = pd.DataFrame()
+
+    for fold in fold_list:
+
+        fold_path = os.path.join(prediction_dir, str(fold))
+
+        for Fset in steps:
+            # break
+            preds_path = os.path.join(fold_path, f"prediction_{Fset}_{fold}.xlsx")
+            probs_path = os.path.join(fold_path, f"probability_{Fset}_{fold}.xlsx")
+
+            preds = pd.read_excel(preds_path, engine="openpyxl", index_col=0)
+            probs = pd.read_excel(probs_path, engine="openpyxl", index_col=0)
+
+            preds.index.name = 'ID'
+            probs.index.name = 'ID'
+
+            cols_to_drop = [col for col in probs.columns.to_list() if col.endswith("_0_T1")]
+            probs = probs.drop(cols_to_drop + ["True"], axis=1)
+
+            clear_names = [col.replace("_1_T1", "") for col in probs.columns.to_list()]
+            new_names = pd.MultiIndex.from_product([clear_names, ["probability"]])
+
+            probs.columns = new_names
+
+            new_names = pd.MultiIndex.from_product([preds.columns.to_list(), ["prediction"]])
+
+            preds.columns = new_names
+
+            preds = pd.concat([preds, probs], axis=1)
+
+            for classifier in preds.columns.levels[0]:
+                preds[(classifier, "label")] = preds[("True", "prediction")]
+
+            preds = preds.drop([("True", "label"), ("True", "prediction")], axis=1)
+
+            preds = preds.assign(fold=fold, Fset=Fset)
+
+            preds = preds.reset_index().set_index(["Fset", "fold", "ID"])
+
+            results = pd.concat([results, preds], axis=0)
+
+    return results.sort_index(axis=1)
+
 
 def compute_performance(results, performance_dir, step):
     results = results.set_index("ID")
 
-    #TP = sum(pd.DataFrame([results.label == 1, results.prediction == 1]).all(axis=0))
-    #TN = sum(pd.DataFrame([results.label == 0, results.prediction == 0]).all(axis=0))
-    #FP = sum(pd.DataFrame([results.label == 0, results.prediction == 1]).all(axis=0))
-    #FN = sum(pd.DataFrame([results.label == 1, results.prediction == 0]).all(axis=0))
+    # TP = sum(pd.DataFrame([results.label == 1, results.prediction == 1]).all(axis=0))
+    # TN = sum(pd.DataFrame([results.label == 0, results.prediction == 0]).all(axis=0))
+    # FP = sum(pd.DataFrame([results.label == 0, results.prediction == 1]).all(axis=0))
+    # FN = sum(pd.DataFrame([results.label == 1, results.prediction == 0]).all(axis=0))
     TP = sum(pd.DataFrame([results.label == 0, results.prediction == 0]).all(axis=0))
     TN = sum(pd.DataFrame([results.label == 1, results.prediction == 1]).all(axis=0))
     FP = sum(pd.DataFrame([results.label == 1, results.prediction == 0]).all(axis=0))
@@ -659,7 +806,8 @@ def compute_performance(results, performance_dir, step):
     # all0 = sum(results.label == 0)/results.shape[0]
     # all1 = sum(results.label == 1)/results.shape[0]
 
-    performance = {"AUC": auc, "accuracy": accuracy, "recall": recall, "precision": precision, "specificity": specificity, "fscore": fscore}
+    performance = {"AUC": auc, "accuracy": accuracy, "recall": recall, "precision": precision,
+                   "specificity": specificity, "fscore": fscore}
 
     performance.update((metric, [round(value * 100, 2)]) for metric, value in performance.items())
 
@@ -696,13 +844,18 @@ def get_performance(results, performance_dir):
         performance_fold_dir = os.path.join(performance_dir, str(fold))
         util_general.create_dir(performance_fold_dir)
 
-    performance_per_fold = results.groupby(by=["Fset", "fold", "classifier"]).apply(lambda x: compute_performance(x, performance_dir=os.path.join(performance_dir, str(x.name[1])), step=x.name[0])).droplevel(3)
+    performance_per_fold = results.groupby(by=["Fset", "fold", "classifier"]).apply(
+        lambda x: compute_performance(x, performance_dir=os.path.join(performance_dir, str(x.name[1])),
+                                      step=x.name[0])).droplevel(3)
 
-    average_performance = performance_per_fold.reset_index().drop("fold", axis=1).groupby(by=["Fset", "classifier"]).agg(["mean", "std"]).round(2)
+    average_performance = performance_per_fold.reset_index().drop("fold", axis=1).groupby(
+        by=["Fset", "classifier"]).agg(["mean", "std"]).round(2)
 
     performance_per_fold = performance_per_fold.reorder_levels([0, 2, 1], axis=0).unstack()
 
-    performance = pd.concat([performance_per_fold, average_performance], axis=1).reorder_levels([1, 0], axis=1).sort_index(axis=1)
+    performance = pd.concat([performance_per_fold, average_performance], axis=1).reorder_levels([1, 0],
+                                                                                                axis=1).sort_index(
+        axis=1)
 
     performance = performance[["mean", "std"] + list(range(nFolds))]
 
@@ -712,17 +865,11 @@ def get_performance(results, performance_dir):
     return performance
 
 
+# train model Fusion
 
+def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, model_name, data_loaders, model_dir,
+                       device, cfg_trainer):
 
-
-
-
-
-
-
-#train model Fusion
-
-def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, model_name, data_loaders, model_dir, device, cfg_trainer, cfg_batch_size):
     since = time.time()
 
     best_model_wts = copy.deepcopy(model.state_dict())
@@ -734,7 +881,7 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
     early_stop = False
 
     for epoch in range(cfg_trainer["max_epochs"]):
-        #break
+        # break
         print('Epoch {}/{}'.format(epoch, cfg_trainer["max_epochs"] - 1))
         print('-' * 10)
 
@@ -743,7 +890,7 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
             if phase == 'train':
                 model.train()  # Set model to training mode
             else:
-                model.eval()   # Set model to evaluate mode
+                model.eval()  # Set model to evaluate mode
 
             running_corrects = 0
 
@@ -751,14 +898,14 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
             running_loss_2 = 0.0
 
             # Iterate over data
-            with tqdm(total=len(data_loaders[phase].dataset), desc=f'Epoch {epoch + 1}/{cfg_trainer["max_epochs"]}', unit='img') as pbar:
+            with tqdm(total=len(data_loaders[phase].dataset), desc=f'Epoch {epoch + 1}/{cfg_trainer["max_epochs"]}',unit='img') as pbar:
 
                 for inputs1, inputs2, labels, file_names in data_loaders[phase]:
-                    #break
-                    inputs1 = inputs1.to(device)  #T1
-                    labels = labels.to(device)  #T2
 
-                    inputs2 = inputs2.to(device)
+                    inputs1 = inputs1.to(device)  # T1
+                    labels = labels.to(device)
+
+                    inputs2 = inputs2.to(device) # T2
 
                     # zero the parameter gradients
                     optimizer.zero_grad()
@@ -766,27 +913,18 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
                     # forward
                     # track history if only in train
                     with torch.set_grad_enabled(phase == 'train'):
-                        outputs1, outputs2 = model(inputs1.float(), inputs2.float())    #due input
+                        outputs1, outputs2 = model(inputs1.float(), inputs2.float())
+                        probs1 = nn.functional.softmax(outputs1, 1)
+                        probs2 = nn.functional.softmax(outputs2, 1)
+
+                        mean_probs = (probs1 + probs2) / 2
+                        _, preds = torch.max(mean_probs, dim=1)
 
                         loss1 = criterion_1(outputs1, labels)
                         loss2 = criterion_2(outputs2, labels)
 
                         loss = loss1 + loss2
                         pbar.set_postfix(**{'loss (batch)': loss.item()})
-
-                        softmax = nn.Softmax(dim=1)
-
-                        outputs1 = softmax(outputs1)
-                        outputs2 = softmax(outputs2)
-
-                        for i in range(0, int(cfg_batch_size)):
-                            out = [outputs1[i], outputs2[i]]
-                            media0 = ((out[i][0] + out[i + 1][0]) /2)
-                            media1 = ((out[i][1] + out[i + 1][1]) /2)
-                            if media0 > media1:
-                                preds = 0
-                            else:
-                                preds = 1
 
                         # backward + optimize only if in training phase
                         if phase == 'train':
@@ -798,7 +936,6 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
                     running_loss_2 += loss.item() * inputs2.size(0)
 
                     running_loss = running_loss_1 + running_loss_2
-
                     running_corrects += torch.sum(preds == labels.data)
 
                     pbar.update(inputs1.shape[0])
@@ -806,7 +943,6 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
 
             epoch_loss = running_loss / len(data_loaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(data_loaders[phase].dataset)
-
 
             if phase == 'val':
                 scheduler.step(epoch_loss)
@@ -856,8 +992,7 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
     return model, history
 
 
-def evaluate_fusion(model, data_loader, device, cfg_batch_size):
-
+def evaluate_fusion(model, data_loader, device):
     # Global and Class Accuracy
     correct_pred = {classname: 0 for classname in list(data_loader.dataset.idx_to_class.values()) + ["all"]}
     total_pred = {classname: 0 for classname in list(data_loader.dataset.idx_to_class.values()) + ["all"]}
@@ -866,37 +1001,30 @@ def evaluate_fusion(model, data_loader, device, cfg_batch_size):
     model.eval()
     with torch.no_grad():
         for inputs1, inputs2, labels, file_names in tqdm(data_loader):
+
             inputs1 = inputs1.to(device)
             inputs2 = inputs2.to(device)
             labels = labels.to(device)
+            outputs1, outputs2 = model(inputs1.float(), inputs2.float())
+            probs1 = nn.functional.softmax(outputs1, 1)
+            probs2 = nn.functional.softmax(outputs2, 1)
+
+            mean_probs = (probs1 + probs2) / 2
+            _, preds = torch.max(mean_probs, dim=1)
+
+
             # Prediction
-            outputs1 = model(inputs1.float())
-            outputs2 = model(inputs2.float())
-
-            softmax = nn.Softmax(dim=1)
-
-            outputs1 = softmax(outputs1)
-            outputs2 = softmax(outputs2)
-
-            for i in range(0, int(cfg_batch_size)):
-                out = [outputs1[i], outputs2[i]]
-                media0 = (out[i][0] + out[i + 1][0]) / 2
-                media1 = (out[i][1] + out[i + 1][1]) / 2
-                if media0 > media1:
-                    preds = 0
-                else:
-                    preds = 1
-
-            # global
             correct_pred['all'] += (preds == labels).sum().item()
             total_pred['all'] += labels.size(0)
+
             # class
             for label, prediction in zip(labels, preds):
                 if label == prediction:
                     correct_pred[data_loader.dataset.idx_to_class[label.item()]] += 1
                 total_pred[data_loader.dataset.idx_to_class[label.item()]] += 1
 
-    # Accuracy
-    test_results = {k: correct_pred[k] / total_pred[k] for k in correct_pred.keys() & total_pred}
+            # Accuracy
+        test_results = {k: correct_pred[k] / total_pred[k] for k in correct_pred.keys() & total_pred}
 
     return test_results
+

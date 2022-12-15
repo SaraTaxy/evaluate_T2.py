@@ -12,7 +12,7 @@ import src.utils.util_model as util_model
 torch.cuda.empty_cache()
 
 '''
-cfg_file = "./configs/resnet101/T2/resnet101_14_t2.yaml"
+cfg_file = "./configs/resnet18/T2/resnet18_14_t2.yaml"
 with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 '''

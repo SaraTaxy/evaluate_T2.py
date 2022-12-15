@@ -21,7 +21,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 # Configuration file
 
 #locale --> per farlo girare sul pc
-cfg_file = "./configs/resnet18/resnet18_14_FUSION.yaml"
+cfg_file = "./configs/resnet18/Fusion_23_Weight/resnet18_FUSION_23_MMTM_1.yaml"
 with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 
@@ -91,7 +91,7 @@ for fold in fold_list:
     print("%s%s%s" % ("*"*50, model_name, "*"*50))
     # util_general.notify_IFTTT("Start %i %s" % (fold, model_name))
 
-    model = util_model.initialize_model(model_name=model_name, num_classes=len(classes), cfg_model=cfg['model'], device=device)
+    model = util_model.initialize_joint_model(fold, model_name=model_name, num_classes=len(classes), cfg_model=cfg['model'], device=device)
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
         model = nn.DataParallel(model)
@@ -109,16 +109,16 @@ for fold in fold_list:
     # LR Scheduler
     scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, mode=cfg['trainer']['scheduler']['mode'], patience=cfg['trainer']['scheduler']['patience'])
 
-    # Train model --> si blocca
+    # Train model
     model, history = util_model.train_model_fusion(model=model, criterion_1=criterion_1, criterion_2=criterion_2, optimizer=optimizer,
                                             scheduler=scheduler, model_name=model_name, data_loaders=data_loaders,
-                                            model_dir=model_fold_dir, device=device, cfg_trainer=cfg['trainer'], cfg_batch_size=cfg['data']['batch_size'])
+                                            model_dir=model_fold_dir, device=device, cfg_trainer=cfg['trainer'])
 
     # Plot Training
     util_model.plot_training(history=history, model_name=model_name, plot_training_dir=plot_training_fold_dir)
 
     # Test model
-    test_results = util_model.evaluate_fusion(model=model, data_loader=data_loaders['test'], device=device, cfg_batch_size=cfg['data']['batch_size'])
+    test_results = util_model.evaluate_fusion(model=model, data_loader=data_loaders['test'], device=device)
     print(test_results)
 
     # Update report

@@ -14,7 +14,7 @@ torch.cuda.empty_cache()
 # Configuration file
 '''
 #locale --> per farlo girare sul pc
-cfg_file = "./configs/sfcn/T2/sfcn_14_t2.yaml"
+cfg_file = "./configs/SFCN/T2/sfcn_14_t2.yaml"
 with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 '''
@@ -91,3 +91,5 @@ for fold in fold_list:
         # Save Results
         prediction_frame.to_excel(prediction_file, index=True)
         probs_frame.to_excel(probability_file, index=True)
+
+

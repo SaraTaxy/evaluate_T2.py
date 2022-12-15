@@ -20,13 +20,13 @@ source bin/activate         #
 # Executes the code - HERE YOULL NEED TO CHANGE TO YOUR FOLDER
 cd /mimer/NOBACKUP/groups/inphai/sara
 # Train
-python3 ./src/model/train_model_FUSION.py -f ./configs/resnet18/resnet18_14_FUSION.yaml
+python3 ./src/model/train_model_FUSION.py -f ./configs/resnet18/Fusion_23_Weight/resnet18_FUSION_23_no_MMTM.yaml
 
 # Predict
-#python3 ./src/model/prediction_model_T2.py -f ./configs/resnet18/resnet18_14_FUSION.yaml
+python3 ./src/model/prediction_model_FUSION.py -f ./configs/resnet18/Fusion_23_Weight/resnet18_FUSION_23_no_MMTM.yaml
 
 # Evaluate
-#python3 ./src/model/evaluate_T2.py -f ./configs/resnet18/resnet18_14_FUSION.yaml
+python3 ./src/model/evaluate_FUSION.py -f ./configs/resnet18/Fusion_23_Weight/resnet18_FUSION_23_no_MMTM.yaml
 
 
 # Deactivate venv

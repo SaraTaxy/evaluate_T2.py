@@ -9,9 +9,9 @@ import src.utils.util_model as util_model
 # Configuration file
 
 #locale --> per farlo girare sul pc
-#cfg_file = "./configs/resnet101/T2/resnet101_14_t2.yaml"
-#with open(cfg_file) as file:
-    #cfg = yaml.load(file, Loader=yaml.FullLoader)
+cfg_file = "./configs/sfcn/T2/sfcn_14_t2.yaml"
+with open(cfg_file) as file:
+    cfg = yaml.load(file, Loader=yaml.FullLoader)
 
 
 #alvis --> non toccare

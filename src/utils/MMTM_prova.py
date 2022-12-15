@@ -65,61 +65,63 @@ class MMTM(nn.Module):
 
 
 class FusionNetwork(nn.Module):
-    def __init__(self, network_name):
+    def __init__(self, network_name1, network_name2, lista):
         super().__init__()
 
-        self.typeNet_name = network_name
+        self.typeNet_name_1 = network_name1
+        self.typeNet_name_2 = network_name2
+        self.switch = lista
+
 
         #print("** ", network_name, " **" )
-        self.MMTM1 = MMTM(64,64)
+        self.MMTM1 = MMTM(64, 64)
         self.MMTM2 = MMTM(128,128)
         self.MMTM3 = MMTM(256,256)
-        self.MMTM4 = MMTM(512, 512)
+        self.MMTM4 = MMTM(512,512)
 
-    def forward(self, x1, x2, switch = [True, False, False, False]):
 
-        #todo: controlla le dimensioni dei canali e capisci anche model come funziona
+    def forward(self, x1, x2):
 
-        x1 = self.typeNet_name.conv1(x1)
-        x2 = self.typeNet_name.conv1(x2)
-        x1 = self.typeNet_name.bn1(x1)
-        x2 = self.typeNet_name.bn1(x2)
-        x1 = self.typeNet_name.relu(x1)
-        x2 = self.typeNet_name.relu(x2)
-        x1 = self.typeNet_name.maxpool(x1)
-        x2 = self.typeNet_name.maxpool(x2)
-        x1 = self.typeNet_name.layer1(x1)
-        x2 = self.typeNet_name.layer1(x2)
+        x1 = self.typeNet_name_1.conv1(x1)
+        x2 = self.typeNet_name_2.conv1(x2)
+        x1 = self.typeNet_name_1.bn1(x1)
+        x2 = self.typeNet_name_2.bn1(x2)
+        x1 = self.typeNet_name_1.relu(x1)
+        x2 = self.typeNet_name_2.relu(x2)
+        x1 = self.typeNet_name_1.maxpool(x1)
+        x2 = self.typeNet_name_2.maxpool(x2)
+        x1 = self.typeNet_name_1.layer1(x1)
+        x2 = self.typeNet_name_2.layer1(x2)
 
-        if switch[0]:
+        if self.switch[0]:
             x1,x2 = self.MMTM1(x1, x2)
 
-        x1 = self.typeNet_name.layer2(x1)
-        x2 = self.typeNet_name.layer2(x2)
+        x1 = self.typeNet_name_1.layer2(x1)
+        x2 = self.typeNet_name_2.layer2(x2)
 
-        if switch[1]:
+        if self.switch[1]:
             x1,x2 = self.MMTM2(x1,x2)
 
-        x1 = self.typeNet_name.layer3(x1)
-        x2 = self.typeNet_name.layer3(x2)
+        x1 = self.typeNet_name_1.layer3(x1)
+        x2 = self.typeNet_name_2.layer3(x2)
 
-        if switch[2]:
+        if self.switch[2]:
             x1,x2 = self.MMTM3(x1, x2)
 
-        x1 = self.typeNet_name.layer4(x1)
-        x2 = self.typeNet_name.layer4(x2)
+        x1 = self.typeNet_name_1.layer4(x1)
+        x2 = self.typeNet_name_2.layer4(x2)
 
-        if switch[3]:
+        if self.switch[3]:
             x1,x2 = self.MMTM4(x1, x2)
 
-        x_f_1 = self.typeNet_name.avgpool(x1)
-        x_f_2 = self.typeNet_name.avgpool(x2)
+        x_f_1 = self.typeNet_name_1.avgpool(x1)
+        x_f_2 = self.typeNet_name_2.avgpool(x2)
 
         x_f_1 = x_f_1.view(x_f_1.size(0), -1)
         x_f_2 = x_f_2.view(x_f_2.size(0), -1)
 
-        x_f_1 = self.typeNet_name.fc(x_f_1)
-        x_f_2 = self.typeNet_name.fc(x_f_2)
+        x_f_1 = self.typeNet_name_1.fc(x_f_1)
+        x_f_2 = self.typeNet_name_2.fc(x_f_2)
 
         return x_f_1, x_f_2
 

@@ -397,4 +397,5 @@ class ImgDataset_Fusion(torch.utils.data.Dataset):
 
         x1 = loader(img_path=img_path_T1, img_dim=self.img_dim_T1, clip=self.clip_T1, norm=self.norm, step=self.step)
         x2 = loader_T2(img_path=img_path_T2, img_dim=self.img_dim_T2, clip=self.clip_T2, norm=self.norm, step=self.step)
+
         return x1, x2, self.class_to_idx[y], idx
