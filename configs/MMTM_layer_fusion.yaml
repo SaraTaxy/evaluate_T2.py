@@ -1,0 +1,64 @@
+fusion_0 :
+  acc_fusion_0 : 0.5
+
+fusion_1 :
+  acc_fusion_layer_1: 0.67
+  acc_fusion_layer_2: 0.62
+  acc_fusion_layer_3: 0.65
+  acc_fusion_layer_4: 0.61
+
+fusion_2_1:
+  acc_fusion_layer_1_2: 0.65
+  acc_fusion_layer_1_3: 0.61
+  acc_fusion_layer_1_4: 0.68
+
+fusion_2_2:
+  acc_fusion_layer_2_1: 0.65
+  acc_fusion_layer_2_3: 0.72
+  acc_fusion_layer_2_4: 0.75
+
+fusion_2_3:
+  acc_fusion_layer_3_1: 0.61
+  acc_fusion_layer_3_2: 0.72
+  acc_fusion_layer_3_4: 0.75
+
+fusion_2_4:
+  acc_fusion_layer_4_1: 0.61
+  acc_fusion_layer_4_2: 0.72
+  acc_fusion_layer_4_3: 0.75
+
+fusion_3_1:
+  acc_fusion_layer_1_2_3: 0.79
+  acc_fusion_layer_1_2_4: 0.8
+  acc_fusion_layer_1_3_4: 0.8
+  acc_fusion_layer_1_3_2: 0.79
+  acc_fusion_layer_1_4_2: 0.8
+  acc_fusion_layer_1_4_3: 0.81
+
+fusion_3_2:
+  acc_fusion_layer_2_1_3: 0.79
+  acc_fusion_layer_2_1_4: 0.8
+  acc_fusion_layer_2_3_1: 0.8
+  acc_fusion_layer_2_3_4: 0.79
+  acc_fusion_layer_2_4_1: 0.8
+  acc_fusion_layer_2_4_3: 0.81
+
+fusion_3_3:
+  acc_fusion_layer_3_1_2: 0.79
+  acc_fusion_layer_3_1_4: 0.8
+  acc_fusion_layer_3_2_1: 0.8
+  acc_fusion_layer_3_2_4: 0.79
+  acc_fusion_layer_3_4_1: 0.8
+  acc_fusion_layer_3_4_2: 0.81
+
+fusion_3_4:
+  acc_fusion_layer_4_1_2: 0.79
+  acc_fusion_layer_4_1_3: 0.8
+  acc_fusion_layer_4_2_1: 0.8
+  acc_fusion_layer_4_2_3: 0.79
+  acc_fusion_layer_4_3_1: 0.8
+  acc_fusion_layer_4_3_2: 0.81
+
+fusion_4_1:
+  acc_fusion_layer_1_2_3_4: 0.9
+
