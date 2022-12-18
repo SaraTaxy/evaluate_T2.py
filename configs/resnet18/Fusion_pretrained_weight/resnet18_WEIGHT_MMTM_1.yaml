@@ -42,14 +42,23 @@ data:
     - 1
     - 4
 
-  batch_size: 8  #da cambiare con 16
+  batch_size: 8 #da cambiare con 16
+
+a:
+  b:
+    c:
+
 
 model:
   model_name: FusionNetwork
   model_name_1 : resnet18
   model_name_2 : resnet18
   switch: [True, False, False, False]
-  freeze: False
+
+
+  freeze: True
+  layer: ['MMTM2', 'MMTM3', 'MMTM4']
+
   pretrained: False
   pretrained_path:
   pretrained_1: True  #da cambiare con true

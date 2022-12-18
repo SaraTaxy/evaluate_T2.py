@@ -21,7 +21,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 # Configuration file
 
 #locale --> per farlo girare sul pc
-cfg_file = "./configs/resnet18/Fusion_23_Weight/resnet18_FUSION_23_MMTM_1.yaml"
+cfg_file = "./configs/resnet18/Fusion_pretrained_weight/resnet18_WEIGHT_MMTM_1_2.yaml"
 with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 
@@ -58,6 +58,8 @@ util_general.create_dir(report_dir)
 report_file = os.path.join(report_dir, 'report.xlsx')
 plot_training_dir = os.path.join(report_dir, "training")
 util_general.create_dir(plot_training_dir)
+loss_file = os.path.join(report_dir, 'loss')
+util_general.create_dir(loss_file)
 
 # CV
 results = collections.defaultdict(lambda: [])
@@ -70,6 +72,9 @@ for fold in fold_list:
     util_general.create_dir(model_fold_dir)
     plot_training_fold_dir = os.path.join(plot_training_dir, str(fold))
     util_general.create_dir(plot_training_fold_dir)
+    #loss_file = os.path.join(loss_file, str(fold))
+    util_general.create_dir(loss_file)
+    loss_excel = os.path.join(loss_file, 'report_loss_'+str(fold)+'.xlsx')
 
     # Results Frame
     acc_cols.append("%s ACC" % str(fold))
@@ -110,9 +115,10 @@ for fold in fold_list:
     scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, mode=cfg['trainer']['scheduler']['mode'], patience=cfg['trainer']['scheduler']['patience'])
 
     # Train model
-    model, history = util_model.train_model_fusion(model=model, criterion_1=criterion_1, criterion_2=criterion_2, optimizer=optimizer,
+    model, history, loss_1 = util_model.train_model_fusion(model=model, criterion_1=criterion_1, criterion_2=criterion_2, optimizer=optimizer,
                                             scheduler=scheduler, model_name=model_name, data_loaders=data_loaders,
                                             model_dir=model_fold_dir, device=device, cfg_trainer=cfg['trainer'])
+
 
     # Plot Training
     util_model.plot_training(history=history, model_name=model_name, plot_training_dir=plot_training_fold_dir)
@@ -128,6 +134,7 @@ for fold in fold_list:
 
     # Save Results
     results_frame = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in results.items()]))
+    loss_frame = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in loss_1.items()]))
     for c in classes[::-1]:
         results_frame.insert(loc=0, column='std ACC %s' % c, value=results_frame[acc_class_cols[c]].std(axis=1))
         results_frame.insert(loc=0, column='mean ACC %s' % c, value=results_frame[acc_class_cols[c]].mean(axis=1))
@@ -135,4 +142,6 @@ for fold in fold_list:
     results_frame.insert(loc=0, column='mean ACC', value=results_frame[acc_cols].mean(axis=1))
     results_frame.insert(loc=0, column='model', value=model_name)
     results_frame.to_excel(report_file, index=False)
+    loss_frame.to_excel(loss_excel, index=False)
+
     # util_general.notify_IFTTT("End %i %s %f" % (fold, model_name, test_results['all']))

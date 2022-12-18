@@ -27,6 +27,12 @@ def freeze_layer_parameters(model, freeze_layers):
         if name.startswith(tuple(freeze_layers)):
             param.requires_grad = False
 
+def freeze_layer_parameters_fusion(model, freeze_layers, cfg_file):
+    for name, param in model.named_parameters():
+        for elem in freeze_layers:
+            if name.startswith(elem):
+                param.requires_grad = False
+
 
 def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True):
     if model_name == "SFCN":
@@ -107,7 +113,7 @@ def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True
             model.load_state_dict(model_dict)
         model = model.module
         if cfg_model["freeze"]:
-            freeze_layer_parameters(model=model, freeze_layers=cfg_model["freeze_layers"])
+            freeze_layer_parameters_fusion(model=model, freeze_layers=cfg_model["layer"])
     elif "densenet" in model_name:
         if model_name == "densenet121":  # try this one first pretrained ==False
             model = monai.networks.nets.DenseNet121(spatial_dims=3, in_channels=1, out_channels=num_classes,
@@ -880,7 +886,10 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
     epochs_no_improve = 0
     early_stop = False
 
+    loss_1 = {'epoc_num': [], 'loss1': [], 'loss2': [], 'loss_sum': [], 'epoch_stop': []}
+
     for epoch in range(cfg_trainer["max_epochs"]):
+        loss_1['epoc_num'].append(epoch)
         # break
         print('Epoch {}/{}'.format(epoch, cfg_trainer["max_epochs"] - 1))
         print('-' * 10)
@@ -904,7 +913,6 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
 
                     inputs1 = inputs1.to(device)  # T1
                     labels = labels.to(device)
-
                     inputs2 = inputs2.to(device) # T2
 
                     # zero the parameter gradients
@@ -914,6 +922,7 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
                     # track history if only in train
                     with torch.set_grad_enabled(phase == 'train'):
                         outputs1, outputs2 = model(inputs1.float(), inputs2.float())
+
                         probs1 = nn.functional.softmax(outputs1, 1)
                         probs2 = nn.functional.softmax(outputs2, 1)
 
@@ -923,7 +932,13 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
                         loss1 = criterion_1(outputs1, labels)
                         loss2 = criterion_2(outputs2, labels)
 
+                        loss_1['loss1'].append(loss1.tolist())
+                        loss_1['loss2'].append(loss2.tolist())
+
                         loss = loss1 + loss2
+
+                        loss_1['loss_sum'].append(loss.tolist())
+
                         pbar.set_postfix(**{'loss (batch)': loss.item()})
 
                         # backward + optimize only if in training phase
@@ -973,6 +988,7 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
                         break
 
         if early_stop:
+            loss_1['epoch_stop'].append(epoch)
             break
 
     time_elapsed = time.time() - since
@@ -989,7 +1005,7 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
     # Format history
     history = pd.DataFrame.from_dict(history, orient='index').transpose()
 
-    return model, history
+    return model, history, loss_1
 
 
 def evaluate_fusion(model, data_loader, device):
