@@ -48,8 +48,18 @@ model:
   model_name: FusionNetwork
   model_name_1 : resnet18
   model_name_2 : resnet18
-  switch: [True, False, False, True]
-  freeze: False
+  switch:
+    - True
+    - False
+    - False
+    - True
+  freeze: True
+  layer_freeze:
+    - MMTM2
+    - MMTM3
+  layer_unfreeze:
+    - MMTM1
+    - MMTM4
   pretrained: False
   pretrained_path:
   pretrained_1: True  #da cambiare con true

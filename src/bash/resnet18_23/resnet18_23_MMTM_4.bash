@@ -21,13 +21,13 @@ source bin/activate         #
 cd /mimer/NOBACKUP/groups/inphai/sara
 
 # Train
-python3 ./src/model/train_model_FUSION.py -f ./configs/resnet18/Fusion_23_Weight/resnet18_FUSION_23_MMTM_4.yaml
+python3 ./src/model/train_model_FUSION.py -f ./configs/resnet18/Fusion_23_Weight/resnet18_23_MMTM_4.yaml
 
 # Predict
-python3 ./src/model/prediction_model_FUSION.py -f ./configs/resnet18/Fusion_23_Weight/resnet18_FUSION_23_MMTM_4.yaml
+python3 ./src/model/prediction_model_FUSION.py -f ./configs/resnet18/Fusion_23_Weight/resnet18_23_MMTM_4.yaml
 
 # Evaluate
-python3 ./src/model/evaluate_FUSION.py -f ./configs/resnet18/Fusion_23_Weight/resnet18_FUSION_23_MMTM_4.yaml
+python3 ./src/model/evaluate_FUSION.py -f ./configs/resnet18/Fusion_23_Weight/resnet18_23_MMTM_4.yaml
 
 
 # Deactivate venv

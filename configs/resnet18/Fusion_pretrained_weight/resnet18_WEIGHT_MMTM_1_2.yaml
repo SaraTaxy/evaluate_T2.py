@@ -42,19 +42,31 @@ data:
     - 1
     - 4
 
-  batch_size: 2  #da cambiare con 16
+  batch_size: 8  #da cambiare con 16
 
 model:
   model_name: FusionNetwork
   model_name_1 : resnet18
   model_name_2 : resnet18
-  switch: [True, True, False, False]
-  freeze: False
+  switch:
+    - True
+    - True
+    - False
+    - False
+  freeze: True
+  layer_freeze:
+    - MMTM3
+    - MMTM4
+
+  layer_unfreeze:
+    - MMTM2
+    - MMTM1
+
   pretrained: False
   pretrained_path:
-  pretrained_1: False #da cambiare con true
+  pretrained_1: True #da cambiare con true
   pretrained_path_1:  ./models/cnn/resnet18_WEIGHTED_MMTM_1
-  pretrained_2: False
+  pretrained_2: True
   pretrained_path_2:  ./models/cnn/resnet18_WEIGHTED_MMTM_1
 
 trainer:

@@ -5,12 +5,13 @@ import yaml
 
 import src.utils.util_general as util_general
 import src.utils.util_model as util_model
+import pandas as pd
 
 # Configuration file
 
 '''
 #locale --> per farlo girare sul pc
-cfg_file = "./configs/resnet18/resnet18_FUSION_23_no_MMTM.yaml"
+cfg_file = "./configs/resnet18/Fusion_23_Weight/resnet18_23_MMTM_1.yaml"
 with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 '''
@@ -37,9 +38,13 @@ report_dir_exp = os.path.join(report_dir, exp_name)
 prediction_dir = os.path.join(report_dir_exp, "prediction")
 performance_dir = os.path.join(report_dir_exp, "performance")
 util_general.create_dir(performance_dir)
+loss_dir = os.path.join(report_dir_exp, "loss")
 
 # Load predictions
-results = util_model.get_predictions_FUSION(prediction_dir, fold_list, steps)
+results, l1 = util_model.get_predictions_FUSION(prediction_dir, fold_list, steps)
+
+l1 = pd.DataFrame(l1)
+l1.to_excel(os.path.join(loss_dir, "resume_loss.xlsx" ))
 
 # Evaluate
-performance = util_model.get_performance(results, performance_dir)
+performance = util_model.get_performance( results, performance_dir)

@@ -27,11 +27,18 @@ def freeze_layer_parameters(model, freeze_layers):
         if name.startswith(tuple(freeze_layers)):
             param.requires_grad = False
 
-def freeze_layer_parameters_fusion(model, freeze_layers, cfg_file):
+def freeze_layer_parameters_fusion(model, freeze_layers):
     for name, param in model.named_parameters():
         for elem in freeze_layers:
             if name.startswith(elem):
                 param.requires_grad = False
+
+# check layer config file freeze_layers
+def unfreeze_layer_parameters_fusion(model, unfreeze_layers):
+    for name, param in model.named_parameters():
+        for elem in unfreeze_layers:
+            if name.startswith(elem):
+                param.requires_grad = True
 
 
 def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True):
@@ -65,7 +72,7 @@ def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True
             model.load_state_dict(model_dict)
         model = model.module
         if cfg_model["freeze"]:
-            freeze_layer_parameters(model=model, freeze_layers=cfg_model["freeze_layers"])
+            freeze_layer_parameters(model=model, freeze_layers=cfg_model["layer_freeze"])
     elif model_name.startswith("resnet"):
         if model_name == "resnet10":
             model = resnet.resnet10(spatial_dims=3, num_classes=num_classes)
@@ -113,7 +120,9 @@ def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True
             model.load_state_dict(model_dict)
         model = model.module
         if cfg_model["freeze"]:
-            freeze_layer_parameters_fusion(model=model, freeze_layers=cfg_model["layer"])
+            freeze_layer_parameters_fusion(model=model, freeze_layers=cfg_model["layer_freeze"])
+            unfreeze_layer_parameters_fusion(model=model, unfreeze_layers=cfg_model["layer_unfreeze"])
+
     elif "densenet" in model_name:
         if model_name == "densenet121":  # try this one first pretrained ==False
             model = monai.networks.nets.DenseNet121(spatial_dims=3, in_channels=1, out_channels=num_classes,
@@ -195,14 +204,23 @@ def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True
 def initialize_joint_model(fold, model_name, num_classes, cfg_model, device):
 
     if model_name in ["FusionNetwork", "resnet50SFCN", "resnet50SFCN_prob", "resnet50SFCN_prob_multi"]:
-        print(model_name)
+        #print(model_name)
         # Single Models
         if cfg_model['pretrained_1']:
             cfg_model['pretrained'] = True
             if os.path.isdir(cfg_model['pretrained_path_1']):
-                cfg_model['pretrained_path'] = os.path.join(cfg_model['pretrained_path_1'], str(fold),
+                if cfg_model['pretrained_path_1'] == './models/cnn/resnet18_T1_14/':
+                    cfg_model['pretrained_path'] = os.path.join(cfg_model['pretrained_path_1'], str(fold),
+                                                                "resnet18.pt")
+                    state_dict = False
+                elif cfg_model['pretrained_path_1'] == './models/cnn/pretrained/':
+                    cfg_model['pretrained_path'] = os.path.join(cfg_model['pretrained_path_1'], str(fold),
+                                                                "resnet_18_23dataset.pt")
+                    state_dict = False
+                else:
+                    cfg_model['pretrained_path'] = os.path.join(cfg_model['pretrained_path_1'], str(fold),
                                                             "%s.pt" % model_name)
-                state_dict = False
+                    state_dict = False
             if os.path.isfile(cfg_model['pretrained_path_1']):
                 cfg_model['pretrained_path'] = cfg_model['pretrained_path_1']
                 state_dict = True
@@ -217,9 +235,18 @@ def initialize_joint_model(fold, model_name, num_classes, cfg_model, device):
         if cfg_model['pretrained_2']:
             cfg_model['pretrained'] = True
             if os.path.isdir(cfg_model['pretrained_path_2']):
-                cfg_model['pretrained_path'] = os.path.join(cfg_model['pretrained_path_2'], str(fold),
-                                                            "%s.pt" % model_name)
-                state_dict = False
+                if cfg_model['pretrained_path_2'] == './models/cnn/resnet18_T2_14/':
+                    cfg_model['pretrained_path'] = os.path.join(cfg_model['pretrained_path_2'], str(fold),
+                                                                "resnet18.pt")
+                    state_dict = False
+                elif cfg_model['pretrained_path_2'] == './models/cnn/pretrained/':
+                    cfg_model['pretrained_path'] = os.path.join(cfg_model['pretrained_path_2'], str(fold),
+                                                                "resnet_18_23dataset.pt")
+                    state_dict = False
+                else:
+                    cfg_model['pretrained_path'] = os.path.join(cfg_model['pretrained_path_2'], str(fold),
+                                                                "%s.pt" % model_name)
+                    state_dict = False
             if os.path.isfile(cfg_model['pretrained_path_2']):
                 cfg_model['pretrained_path'] = cfg_model['pretrained_path_2']
                 state_dict = True
@@ -732,51 +759,76 @@ def get_predictions(prediction_dir, fold_list, steps):
 
 def get_predictions_FUSION(prediction_dir, fold_list, steps):
     results = pd.DataFrame()
-
+    l1 = []
     for fold in fold_list:
-
         fold_path = os.path.join(prediction_dir, str(fold))
-
+        lo = []
         for Fset in steps:
-            # break
-            preds_path = os.path.join(fold_path, f"prediction_{Fset}_{fold}.xlsx")
-            probs_path = os.path.join(fold_path, f"probability_{Fset}_{fold}.xlsx")
+            if Fset == 'train' or Fset == 'val' or Fset == 'test':
+                loss_summary =[]
+                somma_loss = 0
+                # break
+                preds_path = os.path.join(fold_path, f"prediction_{Fset}_{fold}.xlsx")
+                probs_path = os.path.join(fold_path, f"probability_{Fset}_{fold}.xlsx")
 
-            preds = pd.read_excel(preds_path, engine="openpyxl", index_col=0)
-            probs = pd.read_excel(probs_path, engine="openpyxl", index_col=0)
+                preds = pd.read_excel(preds_path, engine="openpyxl", index_col=0)
+                probs = pd.read_excel(probs_path, engine="openpyxl", index_col=0)
 
-            preds.index.name = 'ID'
-            probs.index.name = 'ID'
+                lo = [probs['FusionNetwork_0_T1'], probs['FusionNetwork_1_T1'], probs['True'], preds['FusionNetwork']]
+                lo = pd.DataFrame(lo)
+                lo = lo.transpose()
 
-            cols_to_drop = [col for col in probs.columns.to_list() if col.endswith("_0_T1")]
-            probs = probs.drop(cols_to_drop + ["True"], axis=1)
+                a = lo['FusionNetwork'].to_list()
+                p1 = lo['FusionNetwork_1_T1'].to_list()
+                p0 = lo['FusionNetwork_0_T1'].to_list()
 
-            clear_names = [col.replace("_1_T1", "") for col in probs.columns.to_list()]
-            new_names = pd.MultiIndex.from_product([clear_names, ["probability"]])
+                for i in range(0, len(a)):
+                    if a[i] == 1:
+                        cross = -a[i] * np.log(p1[i])
+                        somma_loss += cross
+                    else:
+                        cross = -(1 - a[i]) * np.log(1 - p0[i])
+                        somma_loss += cross
 
-            probs.columns = new_names
+                preds.index.name = 'ID'
+                probs.index.name = 'ID'
 
-            new_names = pd.MultiIndex.from_product([preds.columns.to_list(), ["prediction"]])
+                cols_to_drop = [col for col in probs.columns.to_list() if col.endswith("_0_T1")]
+                probs = probs.drop(cols_to_drop + ["True"], axis=1)
 
-            preds.columns = new_names
+                clear_names = [col.replace("_1_T1", "") for col in probs.columns.to_list()]
+                new_names = pd.MultiIndex.from_product([clear_names, ["probability"]])
 
-            preds = pd.concat([preds, probs], axis=1)
+                probs.columns = new_names
 
-            for classifier in preds.columns.levels[0]:
-                preds[(classifier, "label")] = preds[("True", "prediction")]
+                new_names = pd.MultiIndex.from_product([preds.columns.to_list(), ["prediction"]])
 
-            preds = preds.drop([("True", "label"), ("True", "prediction")], axis=1)
+                preds.columns = new_names
 
-            preds = preds.assign(fold=fold, Fset=Fset)
+                preds = pd.concat([preds, probs], axis=1)
 
-            preds = preds.reset_index().set_index(["Fset", "fold", "ID"])
+                for classifier in preds.columns.levels[0]:
+                    preds[(classifier, "label")] = preds[("True", "prediction")]
 
-            results = pd.concat([results, preds], axis=0)
+                preds = preds.drop([("True", "label"), ("True", "prediction")], axis=1)
 
-    return results.sort_index(axis=1)
+                preds = preds.assign(fold=fold, Fset=Fset)
+
+                preds = preds.reset_index().set_index(["Fset", "fold", "ID"])
+
+                results = pd.concat([results, preds], axis=0)
+
+            loss_mean = somma_loss / len(a)
+            loss_summary.append(fold)
+            loss_summary.append(Fset)
+            loss_summary.append(loss_mean)
+            l1.append(loss_summary)
 
 
-def compute_performance(results, performance_dir, step):
+    return results.sort_index(axis=1), l1
+
+
+def compute_performance( results, performance_dir, step):
     results = results.set_index("ID")
 
     # TP = sum(pd.DataFrame([results.label == 1, results.prediction == 1]).all(axis=0))
@@ -851,7 +903,7 @@ def get_performance(results, performance_dir):
         util_general.create_dir(performance_fold_dir)
 
     performance_per_fold = results.groupby(by=["Fset", "fold", "classifier"]).apply(
-        lambda x: compute_performance(x, performance_dir=os.path.join(performance_dir, str(x.name[1])),
+        lambda x: compute_performance( x, performance_dir=os.path.join(performance_dir, str(x.name[1])),
                                       step=x.name[0])).droplevel(3)
 
     average_performance = performance_per_fold.reset_index().drop("fold", axis=1).groupby(
@@ -859,9 +911,7 @@ def get_performance(results, performance_dir):
 
     performance_per_fold = performance_per_fold.reorder_levels([0, 2, 1], axis=0).unstack()
 
-    performance = pd.concat([performance_per_fold, average_performance], axis=1).reorder_levels([1, 0],
-                                                                                                axis=1).sort_index(
-        axis=1)
+    performance = pd.concat([performance_per_fold, average_performance], axis=1).reorder_levels([1, 0],axis=1).sort_index(axis=1)
 
     performance = performance[["mean", "std"] + list(range(nFolds))]
 
@@ -886,7 +936,7 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
     epochs_no_improve = 0
     early_stop = False
 
-    loss_1 = {'epoc_num': [], 'loss1': [], 'loss2': [], 'loss_sum': [], 'epoch_stop': []}
+    loss_1 = {'epoc_num': [], 'loss1': [], 'loss2': [], 'loss_sum': [], 'epoch_acc': [],'epoch_stop': []}
 
     for epoch in range(cfg_trainer["max_epochs"]):
         loss_1['epoc_num'].append(epoch)
@@ -932,12 +982,7 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
                         loss1 = criterion_1(outputs1, labels)
                         loss2 = criterion_2(outputs2, labels)
 
-                        loss_1['loss1'].append(loss1.tolist())
-                        loss_1['loss2'].append(loss2.tolist())
-
                         loss = loss1 + loss2
-
-                        loss_1['loss_sum'].append(loss.tolist())
 
                         pbar.set_postfix(**{'loss (batch)': loss.item()})
 
@@ -947,8 +992,8 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
                             optimizer.step()
 
                     # statistics
-                    running_loss_1 += loss.item() * inputs1.size(0)
-                    running_loss_2 += loss.item() * inputs2.size(0)
+                    running_loss_1 += loss1.item() * inputs1.size(0)
+                    running_loss_2 += loss2.item() * inputs2.size(0)
 
                     running_loss = running_loss_1 + running_loss_2
                     running_corrects += torch.sum(preds == labels.data)
@@ -956,8 +1001,17 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
                     pbar.update(inputs1.shape[0])
                     pbar.update(inputs2.shape[0])
 
+            epoch_loss_1 = running_loss_1 / len(data_loaders[phase].dataset)
+            epoch_loss_2 = running_loss_2 / len(data_loaders[phase].dataset)
+
+            loss_1['loss1'].append(epoch_loss_1)
+            loss_1['loss2'].append(epoch_loss_2)
+
             epoch_loss = running_loss / len(data_loaders[phase].dataset)
             epoch_acc = running_corrects.double() / len(data_loaders[phase].dataset)
+
+            loss_1['loss_sum'].append(epoch_loss)
+            loss_1['epoch_acc'].append(epoch_acc.tolist())
 
             if phase == 'val':
                 scheduler.step(epoch_loss)
@@ -990,6 +1044,7 @@ def train_model_fusion(model, criterion_1, criterion_2, optimizer, scheduler, mo
         if early_stop:
             loss_1['epoch_stop'].append(epoch)
             break
+
 
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
