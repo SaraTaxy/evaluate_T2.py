@@ -1,5 +1,5 @@
 seed: 0
-exp_name: resnet18_WEIGHT_MMTM_1_2_no_MMTM
+exp_name: resnet18_WEIGHT_MMTM_1_3_no_MMTM_freeze
 
 
 device:
@@ -55,14 +55,19 @@ model:
     - False
   freeze: True
   layer_freeze:
-    - MMTM3
+    - MMTM2
     - MMTM4
 
   layer_unfreeze:
-    - MMTM2
+    - MMTM3
     - MMTM1
 
-  freeze_resnet: False
+  freeze_resnet: True
+  freeze_layers:
+    - layer1
+    - layer2
+    - layer3
+    - layer4
 
   pretrained: False
   pretrained_path:

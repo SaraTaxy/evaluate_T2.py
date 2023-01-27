@@ -1,5 +1,5 @@
 seed: 0
-exp_name: resnet18_WEIGHT_MMTM_1_4
+exp_name: resnet18_WEIGHT_MMTM_1_4_no_MMTM
 
 
 device:
@@ -60,12 +60,15 @@ model:
   layer_unfreeze:
     - MMTM1
     - MMTM4
+
+  freeze_resnet: False
+
   pretrained: False
   pretrained_path:
   pretrained_1: True  #da cambiare con true
-  pretrained_path_1:  ./models/cnn/resnet18_WEIGHTED_no_MMTM
+  pretrained_path_1:  ./models/cnn/resnet18_WEIGHT_no_MMTM
   pretrained_2: True
-  pretrained_path_2:  ./models/cnn/resnet18_WEIGHTED_no_MMTM
+  pretrained_path_2:  ./models/cnn/resnet18_WEIGHT_no_MMTM
 
 trainer:
   optimizer:

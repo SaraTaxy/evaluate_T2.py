@@ -21,7 +21,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 # Configuration file
 
 #locale --> per farlo girare sul pc
-cfg_file = "./configs/resnet18/Fusion_pretrained_weight/resnet18_WEIGHT_MMTM_1_2.yaml"
+cfg_file = "./configs/resnet18/Fusion_pretrained_weight/resnet18_WEIGHT_MMTM_1.yaml"
 with open(cfg_file) as file:
     cfg = yaml.load(file, Loader=yaml.FullLoader)
 

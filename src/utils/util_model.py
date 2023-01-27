@@ -73,6 +73,7 @@ def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True
         model = model.module
         if cfg_model["freeze"]:
             freeze_layer_parameters(model=model, freeze_layers=cfg_model["layer_freeze"])
+
     elif model_name.startswith("resnet"):
         if model_name == "resnet10":
             model = resnet.resnet10(spatial_dims=3, num_classes=num_classes)
@@ -122,6 +123,9 @@ def initialize_model(model_name, num_classes, cfg_model, device, state_dict=True
         if cfg_model["freeze"]:
             freeze_layer_parameters_fusion(model=model, freeze_layers=cfg_model["layer_freeze"])
             unfreeze_layer_parameters_fusion(model=model, unfreeze_layers=cfg_model["layer_unfreeze"])
+
+        if cfg_model["freeze_resnet"]:
+            freeze_layer_parameters(model=model, freeze_layers=cfg_model["freeze_layers"])
 
     elif "densenet" in model_name:
         if model_name == "densenet121":  # try this one first pretrained ==False

@@ -1,5 +1,5 @@
 seed: 0
-exp_name: resnet18_WEIGHT_MMTM_1_2_no_MMTM
+exp_name: resnet18_WEIGHT_MMTM_1_4_no_MMTM
 
 
 device:
@@ -50,23 +50,28 @@ model:
   model_name_2 : resnet18
   switch:
     - True
+    - False
+    - False
     - True
-    - False
-    - False
   freeze: True
   layer_freeze:
+    - MMTM2
     - MMTM3
-    - MMTM4
 
   layer_unfreeze:
-    - MMTM2
     - MMTM1
+    - MMTM4
 
-  freeze_resnet: False
+  freeze_resnet: True
+  freeze_layers:
+    - layer1
+    - layer2
+    - layer3
+    - layer4
 
   pretrained: False
   pretrained_path:
-  pretrained_1: True #da cambiare con true
+  pretrained_1: True  #da cambiare con true
   pretrained_path_1:  ./models/cnn/resnet18_WEIGHT_no_MMTM
   pretrained_2: True
   pretrained_path_2:  ./models/cnn/resnet18_WEIGHT_no_MMTM
