@@ -42,7 +42,7 @@ data:
     - 1
     - 4
 
-  batch_size: 8  #da cambiare con 16
+  batch_size: 1  #da cambiare con 16
 
 model:
   model_name: FusionNetwork
@@ -62,14 +62,16 @@ model:
     - MMTM2
     - MMTM1
 
+  freeze_resnet: False
+
 
 
   pretrained: False
   pretrained_path:
   pretrained_1: True #da cambiare con true
-  pretrained_path_1:  ./models/cnn/resnet18_WEIGHTED_MMTM_1
+  pretrained_path_1:  ./models/cnn/resnet18_WEIGHT_MMTM_1
   pretrained_2: True
-  pretrained_path_2:  ./models/cnn/resnet18_WEIGHTED_MMTM_1
+  pretrained_path_2:  ./models/cnn/resnet18_WEIGHT_MMTM_1
 
 trainer:
   optimizer:

@@ -63,6 +63,7 @@ model:
   layer_unfreeze:
     - MMTM1
 
+  freeze_resnet: False
 
   pretrained: False
   pretrained_path:
